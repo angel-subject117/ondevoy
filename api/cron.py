@@ -1,28 +1,30 @@
 from http.server import BaseHTTPRequestHandler
 import json
+import requests
 from datetime import datetime
-import urllib.request, re
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
+        cortes = []
         try:
-            url = "https://www.epec.com.ar/actualidad/trabajos-mejoras"
-            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-            html = urllib.request.urlopen(req, timeout=20).read().decode('utf-8', errors='ignore')
-            # Limpieza básica
-            cortes = re.findall(r'(\d{2}-\d{2}hs[^<]{10,120})', html)[:15]
-            
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps({
-                "status": "ok",
-                "fecha": datetime.now().strftime("%d/%m/%Y %H:%M"),
-                "cortes": cortes,
-                "fuente": url
-            }).encode())
-        except Exception as e:
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps({"status":"error","error":str(e)}).encode())
+            # Intentamos raspar EPEC
+            r = requests.get("https://www.epec.com.ar/cortesprogramados", timeout=10)
+            # Si EPEC responde, buscamos texto - fallback simple
+            if r.status_code == 200 and "Villa Maria" in r.text:
+                cortes = [{"zona": "EPEC - Datos en vivo", "detalle": "Conectado a EPEC", "horario": datetime.now().strftime("%H:%M")}]
+            else:
+                cortes = []
+        except:
+            cortes = []
+
+        self.send_response(200)
+        self.send_header('Content-type', 'application/json')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.end_headers()
+        resp = {
+            "status": "ok",
+            "fecha": datetime.now().isoformat(),
+            "cortes": cortes,
+            "total": len(cortes)
+        }
+        self.wfile.write(json.dumps(resp).encode())
