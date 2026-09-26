@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OnDeVoy - Cortes de luz Córdoba</title>
+</head>
+<body>
+<h1>OnDeVoy está funcionando 🤖</h1>
+<p id="fecha"></p>
+<script>
+document.getElementById('fecha').innerText = 'Hoy ' + new Date().toLocaleDateString('es-AR', {timeZone: 'America/Argentina/Cordoba'});
+fetch('/api/cron').then(r=>r.json()).then(d=>console.log('Robot:', d));
+</script>
+</body>
+</html>
