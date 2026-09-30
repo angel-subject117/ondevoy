@@ -4,62 +4,60 @@ import fs from 'fs';
 const URL = 'https://www.epec.com.ar/actualidad/trabajos-mejoras';
 
 async function run() {
-  console.log('EPEC Scraper V-FINAL iniciando...');
   const browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage({
-    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-  });
-
+  const page = await browser.newPage({ userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' });
   await page.goto(URL, { waitUntil: 'networkidle', timeout: 60000 });
-  await page.waitForTimeout(7000);
+  await page.waitForTimeout(8000);
 
-  const rawText = await page.evaluate(() => document.body.innerText);
+  const raw = await page.evaluate(() => document.body.innerText);
 
-  // Limpieza y estructura
-  const lineas = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 10);
+  // Cada corte en EPEC empieza con "MOTIVO:"
+  const bloques = raw.split(/MOTIVO:/i).slice(1);
 
-  const lineasUtiles = lineas.filter(l => {
-    const lower = l.toLowerCase();
-    return!lower.includes('sustentabilidad') &&
-          !lower.includes('oficina virtual') &&
-          !lower.includes('epec.com.ar') &&
-          !lower.includes('home') &&
-           l.length < 300;
-  });
+  const cortes = bloques.map(b => {
+    const bloque = 'MOTIVO:' + b;
 
-  const cortes = [];
-  // Cada bloque de EPEC suele tener fecha + barrio + horario
-  for (let i = 0; i < lineasUtiles.length; i++) {
-    const t = lineasUtiles[i];
-    if (t.toLowerCase().includes('mantenimiento') || t.toLowerCase().includes('mejoras') || t.toLowerCase().includes('corte') || t.toLowerCase().includes('barrio')) {
-      cortes.push({
-        fecha: new Date().toLocaleDateString('es-AR'),
-        barrio: t.substring(0, 120),
-        horario: lineasUtiles[i+1]? lineasUtiles[i+1].substring(0, 120) : 'A confirmar en web EPEC',
-        motivo: lineasUtiles[i+2]? lineasUtiles[i+2].substring(0, 200) : t
-      });
-    }
-  }
+    const motivoMatch = bloque.match(/Motivo:\s*([^\n]+)/i);
+    const localidadMatch = bloque.match(/Localidad:\s*([^\n]+)/i);
+    const zonaMatch = bloque.match(/Zona afectada:\s*([^\n]+)/i);
+    const horarioMatch = bloque.match(/De\s+\d{1,2}:\d{2}\s+a\s+\d{1,2}:\d{2}/i);
+    const fechaMatch = bloque.match(/\d{1,2}\/\d{1,2}\/\d{4}/);
 
-  const dataFinal = {
+    const motivo = motivoMatch? motivoMatch[1].trim() : 'Mantenimiento programado';
+    const localidad = localidadMatch? localidadMatch[1].trim() : 'CORDOBA';
+    const zona = zonaMatch? zonaMatch[1].trim() : '';
+    const horario = horarioMatch? horarioMatch[0].trim() : 'A confirmar';
+    const fecha = fechaMatch? fechaMatch[0].trim() : new Date().toLocaleDateString('es-AR');
+
+    // Barrio = Zona si existe, si no Localidad
+    const barrio = zona? `${localidad} - ${zona}` : localidad;
+
+    return {
+      fecha: fecha,
+      barrio: barrio.substring(0, 200),
+      horario: horario,
+      motivo: motivo
+    };
+  }).filter(c => c.barrio.length > 5);
+
+  // Eliminar duplicados y ordenar
+  const unicos = [...new Map(cortes.map(c => [c.barrio + c.horario, c])).values()];
+  unicos.sort((a,b) => a.horario.localeCompare(b.horario));
+
+  const data = {
     fuente: URL,
     actualizado: new Date().toISOString(),
     actualizadoAR: new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Cordoba' }),
-    total: cortes.length || 1,
-    cortes: cortes.length > 0? cortes.slice(0, 20) : [{
-      fecha: new Date().toLocaleDateString('es-AR'),
-      barrio: 'Información general',
-      horario: 'Consultar web oficial',
-      motivo: lineasUtiles.slice(0, 5).join(' | ').substring(0, 400)
-    }],
-    estado: 'OK_FINAL'
+    total: unicos.length,
+    cortes: unicos,
+    estado: 'OK_FINAL_V3'
   };
 
   fs.mkdirSync('public/data', { recursive: true });
-  fs.writeFileSync('public/data/epec.json', JSON.stringify(dataFinal, null, 2));
-
-  console.log('LISTO:', JSON.stringify(dataFinal, null, 2));
+  fs.writeFileSync('public/data/epec.json', JSON.stringify(data, null, 2));
+  console.log('V3 OK:', unicos.length, 'cortes');
+  console.log(JSON.stringify(unicos.slice(0,3), null, 2));
   await browser.close();
 }
 
-run().catch(e => { console.error(e); process.exit(1); });
+run();
