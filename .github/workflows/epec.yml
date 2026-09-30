@@ -1,1 +1,22 @@
-
+name: Scrape EPEC Oficial
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install
+      - run: npx playwright install chromium --with-deps
+      - run: node scraper/epec.js
+      - run: |
+          git config user.name "ondevoy-bot"
+          git config user.email "bot@ondevoy.com.ar"
+          git add public/data/ -f
+          git diff --staged --quiet || git commit -m "update epec"
+          git push
