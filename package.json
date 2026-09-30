@@ -1,0 +1,7 @@
+{
+  "name": "ondevoy-v2",
+  "type": "module",
+  "dependencies": {
+    "playwright": "^1.44.0"
+  }
+}
