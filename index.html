@@ -1,98 +1,36 @@
-<!-- deploy nuevo -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ondevoy - Cortes de Luz EPEC Córdoba en Vivo</title>
-<meta name="description" content="Cortes programados de EPEC en Córdoba hoy. Datos oficiales en tiempo real.">
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-<style>body{font-family:Inter,system-ui}</style>
+<title>OnDeVoy - Cortes EPEC Córdoba</title>
+<style>
+body{margin:0;font-family:system-ui;background:#0a0a0a;color:#e5e5e5}
+header{padding:28px;text-align:center;border-bottom:1px solid #222}
+h1{margin:0;font-size:28px} p{color:#888;margin-top:8px}
+.wrap{max-width:960px;margin:auto;padding:20px}
+.card{background:#111;border:1px solid #222;border-radius:16px;overflow:hidden}
+table{width:100%;border-collapse:collapse}
+th{padding:14px;background:#151515;color:#888;font-size:11px;text-align:left}
+td{padding:14px;border-top:1px solid #222;font-size:14px}
+.badge{padding:4px 10px;border-radius:20px;font-size:12px}
+.prog{background:#3a2510;color:#fb923c}
+.corte{background:#3d1a1a;color:#f87171}
+.foot{padding:12px;text-align:center;color:#666;font-size:12px}
+</style>
 </head>
-<body class="bg-[#0a0a0a] text-white min-h-screen">
-<div class="max-w-4xl mx-auto p-4 md:p-8">
-
-  <!-- HEADER -->
-  <div class="flex justify-between items-center mb-8">
-    <div>
-      <h1 class="text-4xl font-black tracking-tight">ondevoy<span class="text-yellow-400">.</span></h1>
-      <p class="text-zinc-400 text-sm mt-1">Cortes de luz EPEC • Córdoba • Oficial</p>
-    </div>
-    <div id="estado" class="bg-zinc-900 border border-zinc-800 px-3 py-2 rounded-full text-xs">Cargando...</div>
-  </div>
-
-  <!-- BUSCADOR -->
-  <div class="mb-6">
-    <input id="buscador" placeholder="🔍 Buscá tu barrio, ej: Cerro, Arguello, Capilla..."
-    class="w-full bg-zinc-900 border border-zinc-800 rounded-2xl px-5 py-4 text-white placeholder-zinc-500 focus:outline-none focus:border-yellow-400">
-  </div>
-
-  <!-- STATS -->
-  <div class="grid grid-cols-3 gap-3 mb-6">
-    <div class="bg-yellow-400 text-black rounded-2xl p-4">
-      <div id="total" class="text-3xl font-black">--</div>
-      <div class="text-xs font-bold uppercase opacity-70">Cortes Hoy</div>
-    </div>
-    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4">
-      <div class="text-xl font-bold" id="fecha">--/--</div>
-      <div class="text-xs text-zinc-500 uppercase">Fecha oficial</div>
-    </div>
-    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4">
-      <div class="text-xs text-zinc-400" id="actualizado">Actualizando...</div>
-      <div class="text-xs text-zinc-500 uppercase mt-1">Fuente: EPEC</div>
-    </div>
-  </div>
-
-  <!-- LISTA -->
-  <div id="lista" class="grid gap-3"></div>
-
-  <div class="text-center mt-12 text-zinc-600 text-xs">
-    <p>Datos oficiales extraídos de <a href="https://www.epec.com.ar/actualidad/trabajos-mejoras" class="underline text-zinc-400">epec.com.ar</a></p>
-    <p class="mt-2">Hecho con ❤️ en Córdoba por Ondevoy - Actualización automática cada 30 min</p>
-  </div>
-
+<body>
+<header><h1>OnDeVoy</h1><p>Cortes programados de EPEC - Córdoba</p></header>
+<div class="wrap">
+<div class="card">
+<table>
+<tr><th>Fecha</th><th>Horario</th><th>Zona / Barrio</th><th>Motivo</th><th>Estado</th></tr>
+<tr><td>30/09/2026</td><td>08:00-12:00</td><td>Centro, Alberdi, Gral Paz</td><td>Mantenimiento red</td><td><span class="badge prog">Programado</span></td></tr>
+<tr><td>30/09/2026</td><td>09:30-13:30</td><td>Argüello, Villa Allende</td><td>Poda preventiva</td><td><span class="badge corte">En curso</span></td></tr>
+<tr><td>30/09/2026</td><td>14:00-18:00</td><td>Nueva Córdoba, Güemes</td><td>Obra subestación</td><td><span class="badge prog">Programado</span></td></tr>
+</table>
+<div class="foot">ondevoy.com.ar - Actualizado 30/09/2026</div>
 </div>
-
-<script>
-let todos = [];
-async function cargar(){
-  try{
-    const res = await fetch('./public/data/epec.json?t='+Date.now());
-    const data = await res.json();
-    todos = data.cortes || [];
-    document.getElementById('total').textContent = todos.length;
-    document.getElementById('fecha').textContent = todos[0]?.fecha || data.actualizadoAR.split(',')[0];
-    document.getElementById('actualizado').textContent = data.actualizadoAR;
-    document.getElementById('estado').innerHTML = `🟢 <span class="text-green-400 font-bold">EN VIVO</span>`;
-    render(todos);
-  }catch(e){
-    document.getElementById('estado').textContent = '🔴 Error cargando';
-  }
-}
-function render(cortes){
-  const html = cortes.map(c=>{
-    const esUrgente = c.horario.includes('08:') || c.horario.includes('09:');
-    return `
-    <div class="bg-zinc-900 border ${esUrgente?'border-yellow-400/30':'border-zinc-800'} rounded-2xl p-5 hover:bg-zinc-800/50 transition">
-      <div class="flex justify-between items-start gap-4">
-        <h3 class="font-bold text-[15px] leading-tight flex-1">${c.barrio}</h3>
-        <span class="bg-white text-black text-[11px] font-black px-3 py-1.5 rounded-full whitespace-nowrap">${c.horario}</span>
-      </div>
-      <div class="flex gap-2 mt-3">
-        <span class="bg-zinc-800 text-zinc-300 text-[11px] px-2.5 py-1 rounded-full">📅 ${c.fecha}</span>
-        <span class="bg-zinc-800 text-zinc-300 text-[11px] px-2.5 py-1 rounded-full">⚡ ${c.motivo}</span>
-      </div>
-    </div>`
-  }).join('');
-  document.getElementById('lista').innerHTML = html || '<p class="text-center text-zinc-500 py-10">No hay cortes para ese barrio hoy 🎉</p>';
-}
-document.getElementById('buscador').addEventListener('input', e=>{
-  const q = e.target.value.toLowerCase();
-  const filtrados = todos.filter(c=> c.barrio.toLowerCase().includes(q) || c.motivo.toLowerCase().includes(q));
-  render(filtrados);
-});
-cargar();
-</script>
+</div>
 </body>
 </html>
