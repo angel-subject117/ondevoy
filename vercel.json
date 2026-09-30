@@ -1,13 +1,8 @@
 {
-  "functions": {
-    "api/cron.py": {
-      "runtime": "python3.9"
-    }
-  },
   "crons": [
     {
       "path": "/api/cron",
-      "schedule": "*/30 * * * *"
+      "schedule": "0 0 * * *"
     }
   ]
 }
