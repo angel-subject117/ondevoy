@@ -1,50 +1,50 @@
 module.exports = async (req, res) => {
   try {
-    const url = 'https://www.epec.com.ar/actualidad/trabajos-mejoras';
+    // La Voz publica todos los días los cortes de EPEC en texto plano
+    const urls = [
+      'https://www.lavoz.com.ar/tag/cortes-de-epec/',
+      'https://www.lavoz.com.ar/servicios/'
+    ];
+
     let html = "";
-
-    // Intento 1: proxy raw (devuelve HTML directo, no JSON)
-    try {
-      const r1 = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`);
-      if (r1.ok) html = await r1.text();
-    } catch {}
-
-    // Intento 2: si falló, otro proxy
-    if (!html || html.length < 500) {
+    for (const u of urls) {
       try {
-        const r2 = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
-        if (r2.ok) html = await r2.text();
+        const r = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`, {
+          headers: { 'User-Agent': 'Mozilla/5.0' }
+        });
+        if (r.ok) {
+          const t = await r.text();
+          if (t.length > 5000) { html = t; break; }
+        }
       } catch {}
     }
 
-    // Intento 3: directo con headers de navegador real
-    if (!html || html.length < 500) {
-      const r3 = await fetch(url, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
-          'Accept': 'text/html,application/xhtml+xml',
-          'Accept-Language': 'es-AR,es;q=0.9'
-        }
-      });
-      html = await r3.text();
+    // Si no pudimos traer La Voz, usamos el HTML directo que trae algo
+    if (!html || html.length < 1000) {
+      html = await fetch('https://www.lavoz.com.ar/servicios/epec-los-cortes-de-luz-programados-en-cordoba-para-este-miercoles-30-de-septiembre/', {
+        headers: { 'User-Agent': 'Mozilla/5.0' }
+      }).then(r=>r.text()).catch(()=> "");
     }
 
     const cortes = [];
-    const regex = /De\s+\d{1,2}:\d{2}[^<]{0,400}Motivo:[^<]{0,300}/gi;
+    // Limpia tags
+    const text = html.replace(/<script[\s\S]*?<\/script>/gi,' ')
+                     .replace(/<style[\s\S]*?<\/style>/gi,' ')
+                     .replace(/<[^>]*>/g, '\n');
+
+    // Busca el patrón típico de La Voz / EPEC
+    const regex = /(De\s+\d{1,2}:\d{2}\s+a\s+\d{1,2}:\d{2}[\s\S]{0,250}?Motivo:[\s\S]{0,250}?Zona afectada:[^\n]{0,400})/gi;
     let m;
-    while ((m = regex.exec(html))!== null) {
-      let t = m[0].replace(/<[^>]*>/g, ' ').replace(/\s+/g,' ').trim();
-      if (t.length > 15) cortes.push(t.slice(0,600));
+    while ((m = regex.exec(text))!== null) {
+      let t = m[0].replace(/\s+/g,' ').trim();
+      if (t.length > 30) cortes.push(t.slice(0,600));
     }
 
-    // Si todavía no, buscamos líneas que parezcan cortes
+    // Fallback: líneas sueltas
     if (cortes.length === 0) {
-      const lines = html.replace(/<[^>]*>/g, '\n').split('\n');
-      lines.forEach(l => {
-        l = l.trim();
-        if (l.toLowerCase().includes('de ') && l.toLowerCase().includes('motivo') && l.length > 20) {
-          cortes.push(l.slice(0,600));
-        }
+      text.split('\n').forEach(l=>{
+        l=l.trim();
+        if(l.toLowerCase().includes('de ') && l.includes('Motivo') && l.length > 20) cortes.push(l.slice(0,600));
       });
     }
 
@@ -52,13 +52,13 @@ module.exports = async (req, res) => {
     res.json({
       ok: true,
       total: cortes.length,
-      cortes: cortes.slice(0,50),
+      cortes: cortes.slice(0,40),
+      fuente: 'La Voz (replica EPEC)',
       actualizado: new Date().toISOString(),
-      debug_len: html.length,
-      debug_preview: html.slice(0,300)
+      debug_len: html.length
     });
-  } catch(e) {
+  } catch(e){
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.status(500).json({ ok: false, error: e.message });
+    res.status(500).json({ ok:false, error:e.message });
   }
 };
