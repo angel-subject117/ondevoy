@@ -1,82 +1,79 @@
 export default async function handler(req, res) {
   try {
-    const UA = "Mozilla/5.0";
     const PAGE = "https://www.epec.com.ar/actualidad/trabajos-mejoras";
+    const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)";
 
-    const htmlRes = await fetch(PAGE, { headers: { "User-Agent": UA } });
-    const html = await htmlRes.text();
-    const jsUrls = [...html.matchAll(/<script[^>]+src="([^"]+\.js[^"]*)"/g)].map(m => {
-      let u = m[1];
-      if (u.startsWith("/")) return `https://www.epec.com.ar${u}`;
-      return u.startsWith("http")? u : `https://www.epec.com.ar/${u}`;
+    const r = await fetch(PAGE, {
+      headers: {
+        "User-Agent": UA,
+        "Accept": "text/html",
+        "Cache-Control": "no-cache"
+      }
     });
+    const html = await r.text();
 
-    let epecApiKey = null;
-    let candidates = new Set();
+    if (html.length < 1000) throw new Error(`EPEC HTML vacío: ${html.slice(0,200)}`);
 
-    // 1. Leemos el main.js que me mostraste para sacar epecApiKey y la API real
-    for (const jsUrl of jsUrls) {
-      if (!jsUrl.includes("main.")) continue;
-      try {
-        const jr = await fetch(jsUrl, { headers: { "User-Agent": UA } });
-        const js = await jr.text();
-        const keyMatch = js.match(/epecApiKey["':\s]+["']([^"']+)["']/) || js.match(/apiKey["':\s]+["']([^"']{10,})["']/i) || js.match(/x-api-key["':\s]+["']([^"']+)["']/i);
-        if (keyMatch) epecApiKey = keyMatch[1];
+    // Pasamos HTML a texto plano
+    let text = html
+     .replace(/<script[\s\S]*?<\/script>/gi, "\n")
+     .replace(/<style[\s\S]*?<\/style>/gi, "\n")
+     .replace(/<[^>]+>/g, "\n")
+     .replace(/&nbsp;/g, " ")
+     .replace(/\n+/g, "\n");
 
-        // Buscamos también el apikey en formato web-prod
-        const webProd = js.match(/web-prod/);
-        if (webProd &&!epecApiKey) epecApiKey = "web-prod";
+    let cortes = [];
+    // EPEC escribe así en esa página nueva:
+    // ALTA GRACIA
+    // De 08:00 a 11:00
+    // Motivo: Nuevas Obras
+    // Zona afectada: Barrios...
+    const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 2);
 
-        const apis = [...js.matchAll(/["'](\/api\/[^"']+)["']/g)].map(x => x[1]);
-        apis.forEach(p => {
-          if (p.includes("trabajo") || p.includes("corte") || p.includes("mejora")) {
-            candidates.add(`https://www.epec.com.ar${p}`);
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      // Localidad en mayúsculas
+      if (/^[A-ZÁÉÍÓÚÑ\s]{4,30}$/.test(line) && line === line.toUpperCase() && line.length > 3) {
+        const loc = line;
+        if (["TRABAJOS", "MEJORAS", "EPEC", "CORTES", "ENERGIA", "ACTUALIDAD"].some(x => loc.includes(x))) continue;
+
+        // Buscamos las siguientes 5 líneas que tengan De...a... Motivo... Zona...
+        let bloque = lines.slice(i, i+6).join(" | ");
+        const mHora = bloque.match(/De\s+(\d{1,2}:\d{2})\s+a\s+(\d{1,2}:\d{2})/i);
+        const mMotivo = bloque.match(/Motivo:\s*([^|]+)/i);
+        const mZona = bloque.match(/Zona[^:]*:\s*([^|]+)/i);
+
+        if (mHora) {
+          const fecha = new Date().toLocaleDateString('es-AR'); // EPEC muestra el día actual en esa página
+          // Si hay fecha en el bloque, usala
+          const mFecha = bloque.match(/(\d{1,2}\/\d{1,2}\/\d{4})/) || bloque.match(/(\d{4}-\d{2}-\d{2})/);
+          let f = fecha;
+          if (mFecha) {
+            const raw = mFecha[1];
+            if (raw.includes("-")) { const p=raw.split("-"); f=`${p[2]}/${p[1]}/${p[0]}`; } else f=raw;
           }
-        });
-      } catch {}
+          cortes.push(`${f} - ${loc} - De ${mHora[1]} a ${mHora[2]} - Motivo: ${mMotivo?mMotivo[1].trim():""} - Zona: ${mZona?mZona[1].trim():""}`.slice(0,900));
+        }
+      }
     }
 
-    if (candidates.size === 0) {
-      candidates.add("https://www.epec.com.ar/api/trabajos-mejoras");
-      candidates.add("https://www.epec.com.ar/api/cortes");
+    // Fallback: regex global sobre el texto plano
+    if (cortes.length === 0) {
+      const re = /([A-ZÁÉÍÓÚÑ\s]{4,30})\s*\|\s*De\s+(\d{1,2}:\d{2})\s+a\s+(\d{1,2}:\d{2})/gi;
+      let m;
+      while ((m = re.exec(text))!== null) {
+        const loc = m[1].trim();
+        if (loc.length < 4) continue;
+        cortes.push(`${new Date().toLocaleDateString('es-AR')} - ${loc} - De ${m[2]} a ${m[3]}`);
+      }
     }
 
-    if (!epecApiKey) epecApiKey = "web-prod"; // valor que usa EPEC históricamente
-
-    let lista = null;
-    let lastTxt = "";
-
-    // 2. Probamos cada API con la llave que encontramos
-    for (const apiUrl of candidates) {
-      try {
-        const r = await fetch(apiUrl, {
-          headers: {
-            "x-api-key": epecApiKey,
-            "apikey": epecApiKey,
-            "Origin": "https://www.epec.com.ar",
-            "Referer": PAGE,
-            "User-Agent": UA
-          }
-        });
-        const txt = await r.text();
-        lastTxt = txt.slice(0,600);
-        const j = JSON.parse(txt);
-        const arr = Array.isArray(j)? j : (j.data || j.trabajos || j.cortes || []);
-        if (Array.isArray(arr) && arr.length > 0) { lista = arr; break; }
-      } catch {}
+    if (cortes.length === 0) {
+      throw new Error(`No pude parsear ${PAGE}. Texto muestra: ${text.slice(0, 800)}...`);
     }
-
-    if (!lista) throw new Error(`EPEC ${PAGE} devolvió: ${lastTxt} | Key usada: ${epecApiKey} | APIs probadas: ${[...candidates].join(", ")}`);
-
-    const cortes = lista.map(t => {
-      const loc = (t.localidad || '').toString().toUpperCase();
-      const raw = String(t.fecha || '');
-      let fecha = raw; const m = raw.match(/(\d{4})-(\d{2})-(\d{2})/); if (m) fecha = `${m[3]}/${m[2]}/${m[1]}`;
-      return `${fecha} - ${loc} - De ${t.horaDesde||''} a ${t.horaHasta||''} - Motivo: ${t.motivo||''} - Zona: ${t.zona||''}`.trim();
-    });
 
     res.setHeader('Access-Control-Allow-Origin', '*');
-    return res.json({ ok: true, total: cortes.length, cortes: [...new Set(cortes)] });
+    return res.json({ ok: true, total: cortes.length, cortes: [...new Set(cortes)], url: PAGE });
 
   } catch (e) {
     res.setHeader('Access-Control-Allow-Origin', '*');
