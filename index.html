@@ -6,17 +6,16 @@
 <title>OnDeVoy - Cortes EPEC Córdoba</title>
 <style>
 body{background:#0f0f0f;color:#e5e5e5;font-family:system-ui,sans-serif;margin:0;padding:20px}
-h1{text-align:center;margin-bottom:4px;font-size:32px}
+h1{text-align:center;margin-bottom:4px}
 .sub{text-align:center;color:#888;margin-bottom:20px;font-size:14px}
 .card{max-width:1100px;margin:0 auto;background:#1a1a1a;border-radius:12px;border:1px solid #2a2a2a;overflow:hidden}
 .search-box{max-width:1100px;margin:0 auto 16px auto;display:flex}
 .search-box input{flex:1;padding:14px 18px;border-radius:10px;border:1px solid #2a2a2a;background:#1a1a1a;color:#fff;font-size:15px;outline:none}
 .search-box input:focus{border-color:#f5a623}
 table{width:100%;border-collapse:collapse;font-size:14px}
-th{color:#888;text-align:left;padding:14px 16px;border-bottom:1px solid #2a2a2a;font-weight:500;font-size:13px}
+th{color:#888;text-align:left;padding:14px 16px;border-bottom:1px solid #2a2a2a}
 td{padding:14px 16px;border-bottom:1px solid #222;vertical-align:top}
-tr:last-child td{border-bottom:none}
-.badge{padding:5px 12px;border-radius:20px;font-size:12px;white-space:nowrap}
+.badge{padding:5px 12px;border-radius:20px;font-size:12px}
 .prog{background:#3a2a1a;color:#f5a623}
 .curso{background:#3a1a1a;color:#ff5a5a}
 .foot{text-align:center;padding:14px;color:#666;font-size:12px}
@@ -26,72 +25,69 @@ tr:last-child td{border-bottom:none}
 <body>
 <h1>OnDeVoy</h1>
 <div class="sub">Cortes programados de EPEC - Córdoba - Datos oficiales</div>
-
 <div class="search-box">
-<input id="buscador" type="text" placeholder="🔍 Filtrar por barrio, ciudad, motivo... Ej: james, Nueva Córdoba, Cerro, Centro">
+<input id="buscador" type="text" placeholder="🔍 Filtrar por barrio, ciudad, fecha... Ej: tancacha, 02/10/2026, Cerro">
 </div>
-
 <div class="card">
 <div id="content" class="loading">Cargando datos oficiales de EPEC...</div>
 </div>
-
 <script>
 let todosLosCortes = [];
-const fechaHoy = new Date().toLocaleDateString('es-AR');
-
 async function cargar(){
   try{
     const r = await fetch('/api/scrape');
-    if(!r.ok) throw new Error('API EPEC no responde ('+r.status+')');
     const data = await r.json();
-    const cortes = Array.isArray(data)? data : (data.cortes || data.data || []);
+    const cortes = Array.isArray(data)? data : (data.cortes || []);
     todosLosCortes = cortes;
     render(todosLosCortes);
   }catch(e){
-    document.getElementById('content').innerHTML = '<div class="loading">Error cargando EPEC: '+e.message+'<br><small>Refrescá en 1 min</small></div>';
+    document.getElementById('content').innerHTML = '<div class="loading">Error: '+e.message+'</div>';
   }
 }
-
 function render(cortes){
     const cont = document.getElementById('content');
-    if(!cortes || cortes.length===0){
-      cont.innerHTML = '<div class="loading">No hay cortes programados ahora (según EPEC) o no coincide con tu búsqueda</div>';
-      return;
-    }
+    if(!cortes || cortes.length===0){ cont.innerHTML = '<div class="loading">No hay cortes</div>'; return; }
     let html = '<table><tr><th>Fecha / Horario</th><th>Zona / Barrio</th><th>Motivo</th><th>Estado</th></tr>';
-
     cortes.forEach(c => {
       const texto = String(c);
       const partes = texto.split(' - ');
-      const localidad = (partes[0] || 'CORDOBA').trim();
-      const horarioRaw = (partes[1] || 'A confirmar').trim();
-      const motivo = (partes[2] || 'Mantenimiento programado').replace('Motivo:','').trim();
-      const zona = (partes[3] || partes[1] || '').replace('Zona afectada:','').trim();
+      // Formato nuevo: 0=FECHA, 1=LOCALIDAD, 2=HORARIO, 3=MOTIVO, 4=ZONA
+      let fecha = partes[0] || '';
+      let loc = partes[1] || 'CORDOBA';
+      let horario = partes[2] || '';
+      let motivo = (partes[3] || '').replace('Motivo:','').trim();
+      let zona = (partes[4] || '').replace('Zona afectada:','').trim();
 
-      const horaNum = parseInt((horarioRaw.match(/\d+/)||['12'])[0]);
+      // Si el scrape viejo venía sin fecha, el loc era la fecha
+      if(!fecha.match(/\d+\/\d+\/\d+/) && loc.match(/\d+\/\d+\/\d+/)){
+        // caso borde, no debería pasar con el scrape nuevo
+        fecha = loc;
+        loc = horario;
+        horario = motivo;
+        motivo = zona;
+        zona = '';
+      }
+
+      const horaNum = parseInt((horario.match(/\d+/)||['12'])[0]) || 12;
       const ahora = new Date().getHours();
-      const enCurso = horaNum <= ahora && horaNum+1 >= ahora;
+      const enCurso = horaNum <= ahora;
       const estado = enCurso? '<span class="badge curso">En curso</span>' : '<span class="badge prog">Programado</span>';
 
       html += `<tr>
-        <td><b style="color:#fff">${fechaHoy}</b><br><span style="color:#ccc">${horarioRaw}</span></td>
-        <td><b style="color:#fff">${localidad}</b><br><span style="color:#aaa;font-size:12px;line-height:1.3;display:block;max-width:400px">${zona.slice(0,200)}</span></td>
-        <td style="color:#bbb;max-width:250px">${motivo}</td>
+        <td><b style="color:#fff">${fecha}</b><br><span style="color:#ccc">${horario}</span></td>
+        <td><b style="color:#fff">${loc}</b><br><span style="color:#aaa;font-size:12px;max-width:380px;display:block">${zona.slice(0,200)}</span></td>
+        <td style="color:#bbb">${motivo || 'Mantenimiento'}</td>
         <td>${estado}</td>
       </tr>`;
     });
-
     html += `</table><div class="foot">epec.com.ar - ${cortes.length} cortes - Actualizado ${new Date().toLocaleString('es-AR')} - ondevoy.com.ar</div>`;
     cont.innerHTML = html;
 }
-
 document.getElementById('buscador').addEventListener('input', (e)=>{
   const q = e.target.value.toLowerCase().trim();
   if(!q){ render(todosLosCortes); return; }
-  const filtrados = todosLosCortes.filter(c => String(c).toLowerCase().includes(q));
-  render(filtrados);
+  render(todosLosCortes.filter(c => String(c).toLowerCase().includes(q)));
 });
-
 cargar();
 </script>
 </body>
