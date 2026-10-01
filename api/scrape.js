@@ -1,29 +1,29 @@
-const cheerio = require('cheerio');
-
 module.exports = async (req, res) => {
   try {
-    const html = await fetch('https://www.epec.com.ar/actualidad/trabajos-mejoras', {
-      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
-      cache: 'no-store'
-    }).then(r => r.text());
+    // Usamos un proxy para que EPEC no nos bloquee
+    const target = encodeURIComponent('https://www.epec.com.ar/actualidad/trabajos-mejoras');
+    const proxyUrl = `https://api.allorigins.win/get?url=${target}`;
 
-    const $ = cheerio.load(html);
-    // Agarramos TODO el texto de la página
-    const fullText = $('body').text();
+    const data = await fetch(proxyUrl).then(r => r.json());
+    const html = data.contents || "";
 
-    // Separamos por cada corte
+    // Parseo simple sin cheerio para no fallar
     const cortes = [];
-    // Busca patrones tipo "De 07:30 a..."
-    const regex = /De\s+\d{1,2}:\d{2}[^M]*Motivo:[^Z]*Zona[^:]*:[^\n]*/gi;
-    let match;
-    while ((match = regex.exec(fullText))!== null) {
-      cortes.push(match[0].trim().slice(0,500));
+    const regex = /De\s+\d{1,2}:\d{2}[^<]{0,300}Motivo:[^<]{0,200}Zona[^:]*:[^<]{0,300}/gi;
+    let m;
+    while ((m = regex.exec(html))!== null) {
+      // Limpia tags
+      let t = m[0].replace(/<[^>]*>/g, ' ').replace(/\s+/g,' ').trim();
+      if (t.length > 20) cortes.push(t.slice(0,500));
     }
 
-    // Si no encontró con regex, devolvemos texto plano para no quedar en 0
-    if (cortes.length === 0) {
-      const limpio = fullText.split('\n').filter(l => l.includes('De ') && l.length > 10).slice(0,20);
-      limpio.forEach(t => cortes.push(t.trim().slice(0,500)));
+    // Plan B: si aún no encuentra, busca líneas sueltas
+    if (cortes.length === 0 && html.length > 0) {
+      html.split('\n').forEach(line => {
+        if (line.includes('De ') && line.includes('Motivo')) {
+          cortes.push(line.replace(/<[^>]*>/g,'').trim().slice(0,500));
+        }
+      });
     }
 
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -32,7 +32,8 @@ module.exports = async (req, res) => {
       total: cortes.length,
       cortes: cortes.slice(0,50),
       actualizado: new Date().toISOString(),
-      debug_len: fullText.length
+      debug_len: html.length,
+      debug_preview: html.slice(0,200)
     });
   } catch(e) {
     res.status(500).json({ ok: false, error: e.message });
