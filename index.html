@@ -26,92 +26,54 @@ tr:last-child td{border-bottom:none}
 <body>
 <h1>OnDeVoy</h1>
 <div class="sub">Cortes programados de EPEC - Córdoba - Datos oficiales</div>
-
 <div class="search-box">
 <input id="buscador" type="text" placeholder="🔍 Filtrar por barrio, zona, motivo... Ej: Nueva Córdoba, Cerro, Centro">
 </div>
-
 <div class="card">
 <div id="content" class="loading">Cargando datos oficiales de EPEC...</div>
 </div>
-
 <script>
 let todosLosCortes = [];
-
 async function cargar(){
   try{
+    const cont = document.getElementById('content');
     const r = await fetch('/api/cortes');
-    // si tu api esta en otro lado, dejalo como lo tenias vos
-    let cortes = [];
-    try {
-      const data = await r.json();
-      cortes = data.cortes || data || [];
-    } catch {
-      const text = await r.text();
-      // fallback por si viene distinto
-      cortes = [];
-    }
+    if(!r.ok) throw new Error('API no responde');
+    const data = await r.json();
+    const cortes = Array.isArray(data)? data : (data.cortes || []);
 
-    // Si tu API original era otra, probamos la de EPEC directa como tenias
-    if(cortes.length===0){
-        const res = await fetch('https://www.epec.com.ar/cortes/cortes.json').catch(()=>null);
-        if(res){
-            const j = await res.json().catch(()=>null);
-            if(j) cortes = j;
-        }
-    }
-
-    // Guardamos todo para filtrar
     todosLosCortes = cortes;
     render(todosLosCortes);
-
   }catch(e){
     document.getElementById('content').innerHTML = '<div class="loading">Error cargando EPEC: '+e.message+'<br><small>Probá refrescar en 1 min</small></div>';
   }
 }
-
 function render(cortes){
     const cont = document.getElementById('content');
-    if(cortes.length===0){
+    if(!cortes || cortes.length===0){
       cont.innerHTML = '<div class="loading">No hay cortes programados ahora (según EPEC) o no coincide con tu búsqueda</div>';
       return;
     }
-
     let html = '<table><tr><th>Fecha / Horario</th><th>Zona / Barrio</th><th>Motivo</th><th>Estado</th></tr>';
-
     cortes.forEach(c => {
-      // c viene como string: "CORDOBA - De 07:30 a 09:30 - Motivo:... - Zona:..."
       const partes = c.split(' - ');
       const loc = partes[0] || 'CORDOBA';
       const horario = (partes[1] || '').replace('De ', '');
       const motivo = (partes[2] || '').replace('Motivo: ', '');
       const zona = (partes[3] || '').replace('Zona afectada: ', '') || partes[1] || '';
-
       const esHoy = horario.includes('07:') || horario.includes('08:') || horario.includes('09:');
       const estado = esHoy? '<span class="badge curso">En curso</span>' : '<span class="badge prog">Programado</span>';
-
-      html += '<tr>'
-           + '<td>'+(horario || 'A confirmar')+'</td>'
-           + '<td><b>'+loc+'</b><br><span style="color:#aaa;font-size:12px">'+zona.slice(0,120)+'</span></td>'
-           + '<td>'+(motivo || 'Mantenimiento')+'</td>'
-           + '<td>'+estado+'</td>'
-           + '</tr>';
+      html += '<tr><td>'+(horario || 'A confirmar')+'</td><td><b>'+loc+'</b><br><span style="color:#aaa;font-size:12px">'+zona.slice(0,120)+'</span></td><td>'+(motivo || 'Mantenimiento')+'</td><td>'+estado+'</td></tr>';
     });
-
     html += '</table><div class="foot">epec.com.ar - '+cortes.length+' cortes - Actualizado '+new Date().toLocaleString('es-AR')+' - ondevoy.vercel.app</div>';
     cont.innerHTML = html;
 }
-
 document.getElementById('buscador').addEventListener('input', (e)=>{
-  const q = e.target.value.toLowerCase();
-  if(!q){
-    render(todosLosCortes);
-    return;
-  }
+  const q = e.target.value.toLowerCase().trim();
+  if(!q){ render(todosLosCortes); return; }
   const filtrados = todosLosCortes.filter(c => c.toLowerCase().includes(q));
   render(filtrados);
 });
-
 cargar();
 </script>
 </body>
