@@ -1,5 +1,4 @@
-// src/app/api/cortes/route.js - API OFICIAL EPEC cazada por vos
-export async function POST() {
+export async function GET() {
   try {
     const res = await fetch("https://www.epec.com.ar/api/mantenimiento/trabajos-mejora", {
       method: "POST",
@@ -7,18 +6,18 @@ export async function POST() {
         "Content-Type": "application/json",
         "apikey": "web-prod",
         "Origin": "https://www.epec.com.ar",
+        "Referer": "https://www.epec.com.ar/"
       },
       body: JSON.stringify({ trabajoId: null }),
+      cache: "no-store"
     });
-
-    const data = await res.json();
-    return Response.json(data);
+    const json = await res.json();
+    return Response.json(json, { headers: { "Access-Control-Allow-Origin": "*" } });
   } catch (e) {
-    return Response.json({ error: "EPEC no responde" }, { status: 500 });
+    return Response.json({ error: "EPEC no responde", detalle: String(e) }, { status: 500 });
   }
 }
 
-// Para que tu web lo pueda llamar con GET también
-export async function GET() {
-  return POST();
+export async function POST() {
+  return GET();
 }
