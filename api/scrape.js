@@ -3,81 +3,73 @@ export default async function handler(req, res) {
     const UA = "Mozilla/5.0";
     const PAGE = "https://www.epec.com.ar/actualidad/trabajos-mejoras";
 
-    // 1. Bajamos la página que me pasaste
     const htmlRes = await fetch(PAGE, { headers: { "User-Agent": UA } });
     const html = await htmlRes.text();
-
-    // 2. Sacamos TODOS los JS de esa página
     const jsUrls = [...html.matchAll(/<script[^>]+src="([^"]+\.js[^"]*)"/g)].map(m => {
       let u = m[1];
       if (u.startsWith("/")) return `https://www.epec.com.ar${u}`;
       return u.startsWith("http")? u : `https://www.epec.com.ar/${u}`;
     });
 
-    let candidates = new Set([
-      "https://www.epec.com.ar/api/trabajos-mejoras",
-      "https://www.epec.com.ar/api/cortes",
-      "https://www.epec.com.ar/api/trabajos"
-    ]);
+    let epecApiKey = null;
+    let candidates = new Set();
 
-    let foundApis = [];
-
-    for (const jsUrl of jsUrls.slice(0, 10)) {
+    // 1. Leemos el main.js que me mostraste para sacar epecApiKey y la API real
+    for (const jsUrl of jsUrls) {
+      if (!jsUrl.includes("main.")) continue;
       try {
         const jr = await fetch(jsUrl, { headers: { "User-Agent": UA } });
         const js = await jr.text();
-        // Buscamos CUALQUIER cosa que parezca API de EPEC
-        const matches = [...js.matchAll(/["'`]([^"'`]*api[^"'`]*?)["'`]/gi)].map(x => x[1]).filter(s => s.length < 100);
-        matches.forEach(m => {
-          let full = m;
-          if (m.startsWith("/")) full = `https://www.epec.com.ar${m}`;
-          if (full.includes("epec") || full.includes("/api/")) {
-            candidates.add(full);
-            foundApis.push(`${jsUrl.split("/").pop()} -> ${full}`);
+        const keyMatch = js.match(/epecApiKey["':\s]+["']([^"']+)["']/) || js.match(/apiKey["':\s]+["']([^"']{10,})["']/i) || js.match(/x-api-key["':\s]+["']([^"']+)["']/i);
+        if (keyMatch) epecApiKey = keyMatch[1];
+
+        // Buscamos también el apikey en formato web-prod
+        const webProd = js.match(/web-prod/);
+        if (webProd &&!epecApiKey) epecApiKey = "web-prod";
+
+        const apis = [...js.matchAll(/["'](\/api\/[^"']+)["']/g)].map(x => x[1]);
+        apis.forEach(p => {
+          if (p.includes("trabajo") || p.includes("corte") || p.includes("mejora")) {
+            candidates.add(`https://www.epec.com.ar${p}`);
           }
         });
       } catch {}
     }
 
-    // 3. Probamos TODAS las APIs con GET y POST como hace la web real
+    if (candidates.size === 0) {
+      candidates.add("https://www.epec.com.ar/api/trabajos-mejoras");
+      candidates.add("https://www.epec.com.ar/api/cortes");
+    }
+
+    if (!epecApiKey) epecApiKey = "web-prod"; // valor que usa EPEC históricamente
+
     let lista = null;
     let lastTxt = "";
 
+    // 2. Probamos cada API con la llave que encontramos
     for (const apiUrl of candidates) {
       try {
-        // GET
-        let r = await fetch(apiUrl, {
-          headers: { "User-Agent": UA, "Origin": "https://www.epec.com.ar", "Referer": PAGE }
+        const r = await fetch(apiUrl, {
+          headers: {
+            "x-api-key": epecApiKey,
+            "apikey": epecApiKey,
+            "Origin": "https://www.epec.com.ar",
+            "Referer": PAGE,
+            "User-Agent": UA
+          }
         });
-        let txt = await r.text();
-        lastTxt = txt.slice(0,500);
-        try {
-          const j = JSON.parse(txt);
-          const arr = Array.isArray(j)? j : (j.data || j.result || j.trabajos || j.cortes || j.items || []);
-          if (Array.isArray(arr) && arr.length > 0) { lista = arr; break; }
-        } catch {}
-        // POST
-        r = await fetch(apiUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "User-Agent": UA, "Origin": "https://www.epec.com.ar", "Referer": PAGE },
-          body: JSON.stringify({ fechaDesde: new Date().toISOString().slice(0,10) })
-        });
-        txt = await r.text();
-        lastTxt = txt.slice(0,500);
-        try {
-          const j = JSON.parse(txt);
-          const arr = Array.isArray(j)? j : (j.data || j.result || j.trabajos || j.cortes || []);
-          if (Array.isArray(arr) && arr.length > 0) { lista = arr; break; }
-        } catch {}
+        const txt = await r.text();
+        lastTxt = txt.slice(0,600);
+        const j = JSON.parse(txt);
+        const arr = Array.isArray(j)? j : (j.data || j.trabajos || j.cortes || []);
+        if (Array.isArray(arr) && arr.length > 0) { lista = arr; break; }
       } catch {}
     }
 
-    if (!lista) {
-      throw new Error(`EPEC en ${PAGE} no devolvió cortes. Probé APIs: ${[...candidates].join(", ")} | Encontradas en main.js: ${foundApis.slice(0,20).join(" | ")} | Ultima respuesta: ${lastTxt}`);
-    }
+    if (!lista) throw new Error(`EPEC ${PAGE} devolvió: ${lastTxt} | Key usada: ${epecApiKey} | APIs probadas: ${[...candidates].join(", ")}`);
 
     const cortes = lista.map(t => {
-      const loc = (t.localidad || t.ciudad || '').toString().toUpperCase();
+      const loc = (t.localidad || '').toString().toUpperCase();
       const raw = String(t.fecha || '');
       let fecha = raw; const m = raw.match(/(\d{4})-(\d{2})-(\d{2})/); if (m) fecha = `${m[3]}/${m[2]}/${m[1]}`;
       return `${fecha} - ${loc} - De ${t.horaDesde||''} a ${t.horaHasta||''} - Motivo: ${t.motivo||''} - Zona: ${t.zona||''}`.trim();
