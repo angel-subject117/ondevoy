@@ -16,13 +16,26 @@ module.exports = async (req, res) => {
     // La API devuelve un array
     const lista = Array.isArray(json) ? json : (json.data || json.trabajos || json.result || []);
 
-    const cortes = lista.map(t => {
-      const de = t.horaDesde || t.desde || '';
+        const cortes = lista.map(t => {
+      const de = t.horaDesde || t.desde || t.hora || '';
       const hasta = t.horaHasta || t.hasta || '';
       const motivo = t.motivo || t.descripcion || t.tipo || '';
       const zona = t.zona || t.direccion || t.localidad || t.detalle || '';
-      const loc = t.localidad || 'Córdoba';
-      return `${loc} - De ${de} a ${hasta} - Motivo: ${motivo} - Zona afectada: ${zona}`.slice(0, 600);
+      const loc = t.localidad || t.localidadNombre || 'Córdoba';
+      
+      // --- FIX FECHA: EPEC manda la fecha pero no la usabas ---
+      const fechaRaw = t.fecha || t.fechaDesde || t.fechaCorte || t.dia || t.fechaTrabajo || t.fechaProgramada || '';
+      let fecha = '';
+      if(fechaRaw){
+        try{
+          // Si viene "2026-10-02T00:00:00" lo pasamos a 2/10/2026
+          const d = new Date(fechaRaw);
+          if(!isNaN(d)) fecha = d.toLocaleDateString('es-AR');
+          else fecha = String(fechaRaw).slice(0,10);
+        }catch{ fecha = String(fechaRaw).slice(0,10); }
+      }
+
+      return `${fecha} - ${loc} - De ${de} a ${hasta} - Motivo: ${motivo} - Zona afectada: ${zona}`.slice(0, 700);
     }).filter(x => x.length > 20);
 
     res.setHeader('Access-Control-Allow-Origin', '*');
