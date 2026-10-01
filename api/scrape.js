@@ -1,58 +1,79 @@
 export default async function handler(req, res) {
   try {
-    const page = await fetch("https://www.epec.com.ar/cortes-programados", {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-        "Accept": "text/html",
-        "Referer": "https://www.epec.com.ar/"
-      }
+    // 1. Bajamos el HTML de la app nueva
+    const htmlRes = await fetch("https://www.epec.com.ar/cortes-programados", {
+      headers: { "User-Agent": "Mozilla/5.0" }
     });
-    const html = await page.text();
+    const html = await htmlRes.text();
 
-    // EPEC guarda los cortes dentro del JSON de Next.js
-    const nextDataMatch = html.match(/<script id="__NEXT_DATA__"[^>]*>(.*?)<\/script>/s);
-    if (!nextDataMatch) throw new Error("EPEC no mandó __NEXT_DATA__ - HTML: " + html.slice(0,300));
+    // 2. Sacamos todos los.js de la app (main, runtime...)
+    const jsUrls = [...html.matchAll(/src="([^"]+\.js[^"]*)"/g)].map(m => m[1]).map(u => u.startsWith("http")? u : `https://www.epec.com.ar/${u.replace(/^\//, '')}`);
 
-    const data = JSON.parse(nextDataMatch[1]);
-    // Buscamos recursivamente donde estén los cortes
-    const jsonStr = JSON.stringify(data);
-    const cortesRaw = [];
+    let apiCandidates = ["https://www.epec.com.ar/api/cortes", "/api/cortes", "/api/CortesProgramados", "/api/trabajos", "/api/cortes-programados"];
 
-    // EPEC los tiene como { localidad, fecha, horaDesde, horaHasta, motivo, zona }
-    const regex = /\{"localidad":"([^"]+)".*?"fecha":"([^"]+)".*?"horaDesde":"([^"]+)".*?"horaHasta":"([^"]+)".*?"motivo":"([^"]+)".*?"zona":"([^"]+)"\}/g;
-    let m;
-    while ((m = regex.exec(jsonStr))!== null) {
-      cortesRaw.push(m);
+    // 3. Leemos los JS y buscamos donde dice "api/cortes"
+    for (const jsUrl of jsUrls.slice(0, 5)) {
+      try {
+        const jsRes = await fetch(jsUrl, { headers: { "User-Agent": "Mozilla/5.0" } });
+        const js = await jsRes.text();
+        const found = [...js.matchAll(/["'](\/api\/[^"']*corte[^"']*)["']/gi)].map(m => m[1]);
+        const found2 = [...js.matchAll(/["'](https:\/\/[^"']*epec[^"']*\/api\/[^"']*)["']/gi)].map(m => m[1]);
+        apiCandidates = [...new Set([...apiCandidates,...found,...found2])];
+      } catch {}
     }
 
-    // Si no lo encontró con regex, busca en props
-    let lista = [];
-    try {
-      lista = data?.props?.pageProps?.cortes || data?.props?.pageProps?.trabajos || [];
-    } catch {}
+    let lista = null;
+    let lastError = "";
 
-    const finalLista = cortesRaw.length > 0? cortesRaw.map(x => ({
-      localidad: x[1], fecha: x[2], horaDesde: x[3], horaHasta: x[4], motivo: x[5], zona: x[6]
-    })) : lista;
-
-    if (!finalLista || finalLista.length === 0) {
-      throw new Error("EPEC devolvió página pero sin cortes. Está vacío hoy en la web oficial también.");
+    // 4. Probamos todas las APIs que encontramos
+    for (let api of apiCandidates) {
+      const fullUrl = api.startsWith("http")? api : `https://www.epec.com.ar${api.startsWith("/")?"":"/"}${api}`;
+      try {
+        // Probamos POST y GET
+        for (const method of ["POST", "GET"]) {
+          const r = await fetch(fullUrl, {
+            method,
+            headers: {
+              "Content-Type": "application/json",
+              "apikey": "web-prod",
+              "x-api-key": "web-prod",
+              "Origin": "https://www.epec.com.ar",
+              "Referer": "https://www.epec.com.ar/cortes-programados",
+              "User-Agent": "Mozilla/5.0"
+            },
+            body: method === "POST"? JSON.stringify({}) : undefined
+          });
+          const txt = await r.text();
+          try {
+            const j = JSON.parse(txt);
+            const arr = Array.isArray(j)? j : (j.data || j.result || j.items || j.trabajos || j.cortes || []);
+            if (Array.isArray(arr) && arr.length > 0) {
+              lista = arr;
+              break;
+            }
+          } catch {}
+        }
+        if (lista) break;
+      } catch (e) { lastError = e.message; }
     }
 
-    const cortes = finalLista.map(t => {
-      const loc = (t.localidad || '').toString().trim().toUpperCase();
-      let fecha = '';
-      const raw = String(t.fecha || '');
-      const fm = raw.match(/(\d{4})-(\d{2})-(\d{2})/);
-      if (fm) fecha = `${fm[3]}/${fm[2]}/${fm[1]}`; // 2026-10-01 -> 01/10/2026
-      else fecha = raw.slice(0,10);
+    if (!lista || lista.length === 0) {
+      throw new Error(`No encontré cortes. Probé estas APIs: ${apiCandidates.join(", ")} | Ultimo error: ${lastError} | HTML v: ${html.match(/version[^>]+content="([^"]+)"/)?.[1]}`);
+    }
 
-      return `${fecha} - ${loc} - De ${t.horaDesde || ''} a ${t.horaHasta || ''} - Motivo: ${t.motivo || ''} - Zona: ${t.zona || ''}`.trim();
+    const cortes = lista.map(t => {
+      const loc = (t.localidad || t.localidadNombre || t.ciudad || '').toString().trim().toUpperCase();
+      const raw = String(t.fecha || t.fechaCorte || '');
+      let fecha = raw;
+      const m = raw.match(/(\d{4})-(\d{2})-(\d{2})/);
+      if (m) fecha = `${m[3]}/${m[2]}/${m[1]}`; // AUTOMATICO: 2026-10-05 -> 05/10/2026 futuro
+
+      return `${fecha} - ${loc} - De ${t.horaDesde || t.desde || ''} a ${t.horaHasta || t.hasta || ''} - Motivo: ${t.motivo || ''} - Zona: ${t.zona || t.direccion || ''}`.slice(0,800);
     });
 
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Cache-Control', 's-maxage=120, stale-while-revalidate=600');
-    return res.json({ ok: true, total: cortes.length, cortes: [...new Set(cortes)], actualizado: new Date().toISOString() });
+    return res.json({ ok: true, total: cortes.length, cortes: [...new Set(cortes)], actualizado: new Date().toISOString(), apis: apiCandidates });
 
   } catch (e) {
     res.setHeader('Access-Control-Allow-Origin', '*');
