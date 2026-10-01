@@ -16,13 +16,33 @@ module.exports = async (req, res) => {
     // La API devuelve un array
     const lista = Array.isArray(json) ? json : (json.data || json.trabajos || json.result || []);
 
-    const cortes = lista.map(t => {
-      const de = t.horaDesde || t.desde || '';
+        const cortes = lista.map(t => {
+      const de = t.horaDesde || t.desde || t.hora || '';
       const hasta = t.horaHasta || t.hasta || '';
       const motivo = t.motivo || t.descripcion || t.tipo || '';
-      const zona = t.zona || t.direccion || t.localidad || t.detalle || '';
-      const loc = t.localidad || 'Córdoba';
-      return `${loc} - De ${de} a ${hasta} - Motivo: ${motivo} - Zona afectada: ${zona}`.slice(0, 600);
+      const zona = t.zona || t.direccion || t.localidad || t.detalle || t.observaciones || '';
+      const loc = t.localidad || t.localidadNombre || 'Córdoba';
+
+      // --- FIX FECHA REAL ---
+      const fechaRaw = t.fecha || t.fechaCorte || t.fechaTrabajo || t.dia || t.fechaDesde || t.fechaProgramada || t.fechaInicio || '';
+      let fecha = '';
+      if (fechaRaw) {
+        const d = new Date(fechaRaw);
+        if (!isNaN(d.getTime())) {
+          const dd = String(d.getDate()).padStart(2, '0');
+          const mm = String(d.getMonth() + 1).padStart(2, '0');
+          const yyyy = d.getFullYear();
+          fecha = `${dd}/${mm}/${yyyy}`;
+        } else {
+          fecha = String(fechaRaw).slice(0,10);
+        }
+      } else {
+        // Si EPEC no manda fecha en este objeto, usamos hoy como fallback
+        const hoy = new Date();
+        fecha = `${String(hoy.getDate()).padStart(2,'0')}/${String(hoy.getMonth()+1).padStart(2,'0')}/${hoy.getFullYear()}`;
+      }
+
+      return `${fecha} - ${loc} - De ${de} a ${hasta} - Motivo: ${motivo} - Zona afectada: ${zona}`.slice(0, 700);
     }).filter(x => x.length > 20);
 
     res.setHeader('Access-Control-Allow-Origin', '*');
