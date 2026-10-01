@@ -2,35 +2,73 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OnDeVoy - Cortes EPEC Córdoba</title>
 <style>
-body{margin:0;font-family:system-ui;background:#0a0a0a;color:#e5e5e5}
-header{padding:28px;text-align:center;border-bottom:1px solid #222}
-h1{margin:0;font-size:28px} p{color:#888;margin-top:8px}
-.wrap{max-width:960px;margin:auto;padding:20px}
-.card{background:#111;border:1px solid #222;border-radius:16px;overflow:hidden}
-table{width:100%;border-collapse:collapse}
-th{padding:14px;background:#151515;color:#888;font-size:11px;text-align:left}
-td{padding:14px;border-top:1px solid #222;font-size:14px}
+body{background:#0f0f0f;color:#e5e5e5;font-family:system-ui,sans-serif;margin:0;padding:20px}
+h1{text-align:center;margin-bottom:4px}
+.sub{text-align:center;color:#888;margin-bottom:20px;font-size:14px}
+.card{max-width:1000px;margin:0 auto;background:#1a1a1a;border-radius:12px;border:1px solid #2a2a2a;overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{color:#888;text-align:left;padding:12px 16px;border-bottom:1px solid #2a2a2a;font-weight:500}
+td{padding:12px 16px;border-bottom:1px solid #222;vertical-align:top}
+tr:last-child td{border-bottom:none}
 .badge{padding:4px 10px;border-radius:20px;font-size:12px}
-.prog{background:#3a2510;color:#fb923c}
-.corte{background:#3d1a1a;color:#f87171}
-.foot{padding:12px;text-align:center;color:#666;font-size:12px}
+.prog{background:#3a2e1a;color:#f5a623}
+.curso{background:#3a1a1a;color:#ff5a5a}
+.foot{text-align:center;padding:12px;color:#666;font-size:12px}
+.loading{text-align:center;padding:40px;color:#888}
 </style>
 </head>
 <body>
-<header><h1>OnDeVoy</h1><p>Cortes programados de EPEC - Córdoba</p></header>
-<div class="wrap">
+<h1>OnDeVoy</h1>
+<div class="sub">Cortes programados de EPEC - Córdoba - Datos oficiales</div>
 <div class="card">
-<table>
-<tr><th>Fecha</th><th>Horario</th><th>Zona / Barrio</th><th>Motivo</th><th>Estado</th></tr>
-<tr><td>30/09/2026</td><td>08:00-12:00</td><td>Centro, Alberdi, Gral Paz</td><td>Mantenimiento red</td><td><span class="badge prog">Programado</span></td></tr>
-<tr><td>30/09/2026</td><td>09:30-13:30</td><td>Argüello, Villa Allende</td><td>Poda preventiva</td><td><span class="badge corte">En curso</span></td></tr>
-<tr><td>30/09/2026</td><td>14:00-18:00</td><td>Nueva Córdoba, Güemes</td><td>Obra subestación</td><td><span class="badge prog">Programado</span></td></tr>
-</table>
-<div class="foot">ondevoy.com.ar - Actualizado 30/09/2026</div>
+<div id="content" class="loading">Cargando datos oficiales de EPEC...</div>
 </div>
-</div>
+
+<script>
+async function cargar(){
+  try{
+    const res = await fetch('/api/scrape?t='+Date.now());
+    const data = await res.json();
+    const cortes = data.cortes || [];
+    const cont = document.getElementById('content');
+
+    if(cortes.length===0){
+      cont.innerHTML = '<div class="loading">No hay cortes programados ahora (según EPEC)</div>';
+      return;
+    }
+
+    let html = '<table><tr><th>Fecha / Horario</th><th>Zona / Barrio</th><th>Motivo</th><th>Estado</th></tr>';
+
+    cortes.forEach(c => {
+      // c viene como string: "CORDOBA - De 07:30 a 09:30 - Motivo:... - Zona:..."
+      const partes = c.split(' - ');
+      const loc = partes[0] || 'CÓRDOBA';
+      const horario = (partes[1] || '').replace('De ','');
+      const motivo = (partes[2] || '').replace('Motivo: ','');
+      const zona = (partes[3] || '').replace('Zona afectada: ','') || partes[1] || '';
+
+      const esHoy = horario.includes('07:') || horario.includes('08:') || horario.includes('09:');
+      const estado = esHoy? '<span class="badge curso">En curso</span>' : '<span class="badge prog">Programado</span>';
+
+      html += `<tr>
+        <td>${horario || 'A confirmar'}</td>
+        <td><b>${loc}</b><br><span style="color:#aaa;font-size:12px">${zona.slice(0,120)}</span></td>
+        <td>${motivo || 'Mantenimiento'}</td>
+        <td>${estado}</td>
+      </tr>`;
+    });
+
+    html += `</table><div class="foot">epec.com.ar - ${cortes.length} cortes - Actualizado ${new Date().toLocaleString('es-AR')} - ondevoy.vercel.app</div>`;
+    cont.innerHTML = html;
+
+  }catch(e){
+    document.getElementById('content').innerHTML = '<div class="loading">Error cargando EPEC: '+e.message+'<br><small>Probá refrescar en 1 min</small></div>';
+  }
+}
+cargar();
+</script>
 </body>
 </html>
