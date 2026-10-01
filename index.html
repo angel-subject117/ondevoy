@@ -37,7 +37,7 @@ let todosLosCortes = [];
 async function cargar(){
   try{
     const cont = document.getElementById('content');
-    const r = await fetch('/api/cortes');
+    const r = await fetch('/api/scrape');
     if(!r.ok) throw new Error('API no responde');
     const data = await r.json();
     const cortes = Array.isArray(data)? data : (data.cortes || []);
