@@ -1,79 +1,86 @@
 export default async function handler(req, res) {
   try {
     const PAGE = "https://www.epec.com.ar/actualidad/trabajos-mejoras";
-    const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)";
+    const UA = "Mozilla/5.0";
 
-    const r = await fetch(PAGE, {
-      headers: {
-        "User-Agent": UA,
-        "Accept": "text/html",
-        "Cache-Control": "no-cache"
-      }
-    });
+    // 1. Bajamos el HTML vacío para sacar el buildId de Next.js
+    const r = await fetch(PAGE, { headers: { "User-Agent": UA } });
     const html = await r.text();
 
-    if (html.length < 1000) throw new Error(`EPEC HTML vacío: ${html.slice(0,200)}`);
+    let buildId = null;
+    let m = html.match(/\/_next\/data\/([^\/]+)\//);
+    if (m) buildId = m[1];
+    if (!buildId) {
+      const m2 = html.match(/"buildId":"([^"]+)"/);
+      if (m2) buildId = m2[1];
+    }
+    // fallback buildId que me mostraste vos antes
+    if (!buildId) buildId = "131e961849d5e94a9578";
 
-    // Pasamos HTML a texto plano
-    let text = html
-     .replace(/<script[\s\S]*?<\/script>/gi, "\n")
-     .replace(/<style[\s\S]*?<\/style>/gi, "\n")
-     .replace(/<[^>]+>/g, "\n")
-     .replace(/&nbsp;/g, " ")
-     .replace(/\n+/g, "\n");
+    // 2. Probamos todos los JSON donde EPEC guarda trabajos-mejoras
+    const jsonUrls = [
+      `https://www.epec.com.ar/_next/data/${buildId}/actualidad/trabajos-mejoras.json`,
+      `https://www.epec.com.ar/_next/data/${buildId}/actualidad/trabajos-mejoras/trabajos-mejoras.json`,
+      `https://www.epec.com.ar/_next/data/${buildId}.json?slug=actualidad/trabajos-mejoras`
+    ];
 
-    let cortes = [];
-    // EPEC escribe así en esa página nueva:
-    // ALTA GRACIA
-    // De 08:00 a 11:00
-    // Motivo: Nuevas Obras
-    // Zona afectada: Barrios...
-    const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 2);
+    let dataJson = null;
+    let lastErr = "";
 
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      // Localidad en mayúsculas
-      if (/^[A-ZÁÉÍÓÚÑ\s]{4,30}$/.test(line) && line === line.toUpperCase() && line.length > 3) {
-        const loc = line;
-        if (["TRABAJOS", "MEJORAS", "EPEC", "CORTES", "ENERGIA", "ACTUALIDAD"].some(x => loc.includes(x))) continue;
+    for (const ju of jsonUrls) {
+      try {
+        const jr = await fetch(ju, { headers: { "User-Agent": UA, "Referer": PAGE } });
+        const txt = await jr.text();
+        if (txt.length < 100) { lastErr = txt; continue; }
+        const j = JSON.parse(txt);
+        if (JSON.stringify(j).length > 500) { dataJson = j; break; }
+      } catch (e) { lastErr = e.message; }
+    }
 
-        // Buscamos las siguientes 5 líneas que tengan De...a... Motivo... Zona...
-        let bloque = lines.slice(i, i+6).join(" | ");
-        const mHora = bloque.match(/De\s+(\d{1,2}:\d{2})\s+a\s+(\d{1,2}:\d{2})/i);
-        const mMotivo = bloque.match(/Motivo:\s*([^|]+)/i);
-        const mZona = bloque.match(/Zona[^:]*:\s*([^|]+)/i);
+    // También intenta directo el __NEXT_DATA__
+    if (!dataJson) {
+      try {
+        const mNext = html.match(/<script id="__NEXT_DATA__"[^>]*>(.*?)<\/script>/s);
+        if (mNext) dataJson = JSON.parse(mNext[1]);
+      } catch {}
+    }
 
-        if (mHora) {
-          const fecha = new Date().toLocaleDateString('es-AR'); // EPEC muestra el día actual en esa página
-          // Si hay fecha en el bloque, usala
-          const mFecha = bloque.match(/(\d{1,2}\/\d{1,2}\/\d{4})/) || bloque.match(/(\d{4}-\d{2}-\d{2})/);
-          let f = fecha;
-          if (mFecha) {
-            const raw = mFecha[1];
-            if (raw.includes("-")) { const p=raw.split("-"); f=`${p[2]}/${p[1]}/${p[0]}`; } else f=raw;
-          }
-          cortes.push(`${f} - ${loc} - De ${mHora[1]} a ${mHora[2]} - Motivo: ${mMotivo?mMotivo[1].trim():""} - Zona: ${mZona?mZona[1].trim():""}`.slice(0,900));
+    if (!dataJson) throw new Error(`EPEC no dio JSON. buildId=${buildId} probé ${jsonUrls.join(", ")} ultimo: ${lastErr} htmlLen=${html.length}`);
+
+    const str = JSON.stringify(dataJson);
+    // Busca array de trabajos dentro de pageProps
+    const props = dataJson.pageProps || dataJson.props?.pageProps || dataJson;
+
+    let lista = props.trabajos || props.cortes || props.data || props.items || props.trabajosMejoras || [];
+
+    // Si no está directo, busca recursivo cualquier array que tenga localidad + hora
+    if (!Array.isArray(lista) || lista.length === 0) {
+      const found = [...str.matchAll(/"localidad"\s*:\s*"([^"]+)"/gi)];
+      if (found.length > 0) {
+        // Extrae objetos completos con regex simple
+        const reObj = /\{[^\}]*"localidad"[^\}]*\}/gi;
+        let mm;
+        while ((mm = reObj.exec(str))!== null) {
+          try { lista.push(JSON.parse(mm[0])); } catch {}
         }
       }
     }
 
-    // Fallback: regex global sobre el texto plano
-    if (cortes.length === 0) {
-      const re = /([A-ZÁÉÍÓÚÑ\s]{4,30})\s*\|\s*De\s+(\d{1,2}:\d{2})\s+a\s+(\d{1,2}:\d{2})/gi;
-      let m;
-      while ((m = re.exec(text))!== null) {
-        const loc = m[1].trim();
-        if (loc.length < 4) continue;
-        cortes.push(`${new Date().toLocaleDateString('es-AR')} - ${loc} - De ${m[2]} a ${m[3]}`);
-      }
+    if (!Array.isArray(lista) || lista.length === 0) {
+      throw new Error(`JSON de EPEC vacío. Keys: ${Object.keys(props).join(", ")} | preview: ${str.slice(0,800)}`);
     }
 
-    if (cortes.length === 0) {
-      throw new Error(`No pude parsear ${PAGE}. Texto muestra: ${text.slice(0, 800)}...`);
-    }
+    const cortes = lista.map(t => {
+      const loc = (t.localidad || t.ciudad || t.titulo || '').toString().toUpperCase();
+      const raw = String(t.fecha || t.fechaTrabajo || '');
+      let fecha = raw;
+      const mm = raw.match(/(\d{4})-(\d{2})-(\d{2})/);
+      if (mm) fecha = `${mm[3]}/${mm[2]}/${mm[1]}`;
+      return `${fecha} - ${loc} - De ${t.horaDesde || t.desde || ''} a ${t.horaHasta || t.hasta || ''} - Motivo: ${t.motivo || t.descripcion || ''} - Zona: ${t.zona || t.zonaAfectada || ''}`.slice(0,900);
+    });
 
     res.setHeader('Access-Control-Allow-Origin', '*');
-    return res.json({ ok: true, total: cortes.length, cortes: [...new Set(cortes)], url: PAGE });
+    return res.json({ ok: true, total: cortes.length, cortes: [...new Set(cortes)], buildId });
 
   } catch (e) {
     res.setHeader('Access-Control-Allow-Origin', '*');
