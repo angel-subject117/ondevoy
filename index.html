@@ -8,7 +8,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
 body{background:#c5ddf6;min-height:100vh}
-a.card{text-decoration:none;display:block}
+a.card-link{text-decoration:none;display:block;color:inherit}
 .header{background:white;border-radius:0 0 20px 20px;padding:14px 32px;display:flex;justify-content:space-between;align-items:center}
 .logo{display:flex;align-items:center;gap:10px}
 .logo-title{font-size:32px;font-weight:900;color:#1a8ac4}.logo-title span{color:#0a2f5c}
@@ -27,7 +27,7 @@ a.card{text-decoration:none;display:block}
 .services-header h2{font-size:26px;font-weight:800;color:#0a2a5c}
 .services-header .meta{font-size:13px;color:#2a5a8a}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.card{background:white;border-radius:14px;padding:14px 12px;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,0.06);border:1.5px solid #d6e6f5;transition:0.15s}
+.card{background:white;border-radius:14px;padding:14px 12px;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,0.06);border:1.5px solid #d6e6f5;transition:0.15s;cursor:pointer}
 .card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,0.12)}
 .card-icon{width:56px;height:56px;background:#d6e9f7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:28px}
 .card h3{font-size:20px;font-weight:800;color:#0a1f44}
@@ -48,19 +48,24 @@ a.card{text-decoration:none;display:block}
     <svg viewBox="0 0 48 60" width="52" height="52"><path d="M24 0 C10 0 0 10 0 22 C0 38 24 60 24 60 C24 60 48 38 48 22 C48 10 38 0 24 0 Z" fill="#d6ecff" stroke="#3a8ac0" stroke-width="2.5"/><circle cx="24" cy="20" r="11" fill="white" stroke="#3a8ac0" stroke-width="2.2"/></svg>
     <div><div class="logo-title">OnDeVoy<span>.com.ar</span></div><div class="logo-sub">Todo Córdoba en un solo lugar</div></div>
   </div>
-  <nav class="nav"><a href="index.html" class="active">Inicio</a><a href="#">Servicios</a><a href="#">🔔 Alertas</a><a href="#">Ayuda</a><div class="cr">CR</div></nav>
+  <nav class="nav"><a href="./index.html" class="active">Inicio</a><a href="#">Servicios</a><a href="#">🔔 Alertas</a><a href="#">Ayuda</a><div class="cr">CR</div></nav>
 </header>
 <main class="main">
   <div class="title-row"><div class="title"><h1>Panel de Servicios de Córdoba</h1><p>Consulta en tiempo real el estado de los servicios públicos de la ciudad. Actualizado hoy,<br>02 oct 2024 • 09:15hs</p></div><div class="location-badge">📍 Córdoba, Argentina</div></div>
   <div class="services-box">
     <div class="services-header"><h2>Servicios Disponibles</h2><div class="meta">6 servicios • Actualizaciones en vivo</div></div>
     <div class="grid">
-      <a href="epec.html" class="card"><div class="card-icon">💡</div><h3>EPEC</h3><div class="sub">Electricidad</div><div class="badge badge-orange">⚠️ Cortes programados</div><div class="info">3 cortes activos • Zona Nueva Córdoba<br><small>Actualizado: hace 12 min</small></div></a>
-      <a href="aguas.html" class="card"><div class="card-icon">💧</div><h3 style="font-size:19px">Aguas Cordobesas</h3><div class="sub">Agua</div><div class="badge badge-blue">💧 Cortes de agua</div><div class="info">Sin cortes en Centro • 1 corte en Alta Córdoba<br><small>Actualizado: hace 25 min</small></div></a>
-      <a href="cpc.html" class="card"><div class="card-icon">🏢</div><h3>CPC</h3><div class="sub" style="font-size:12px">Centro de Participación Comunal</div><div class="badge badge-green">📅 Turnos CPC</div><div class="info">Turnos disponibles hoy • 14 turnos libres<br><small>Próximo: 10:30 hs</small></div></a>
-      <a href="hospitales.html" class="card"><div class="card-icon">➕</div><h3>Hospitales</h3><div class="sub">Salud Pública</div><div class="badge badge-green">✚ Turnos hospitales</div><div class="info">Turnos disponibles • Hospital Córdoba<br><small>Guardia: Activa 24hs</small></div></a>
-      <a href="transporte.html" class="card"><div class="card-icon">🚌</div><h3>Transporte</h3><div class="sub">Transporte Urbano</div><div class="badge badge-blue">🚌 Mi bondi</div><div class="info">Línea 25 • 8 min | Línea 600 • 12 min<br><small>Frecuencia actualizada</small></div></a>
-      <a href="clima.html" class="card"><div class="card-icon">☁️</div><h3>Clima</h3><div class="sub">Clima Córdoba</div><div class="temp">18°C</div><div class="info">☁️ Parcialmente nublado<br>💨 Humedad 65% • Viento 12 km/h<br><small>Hoy Máx 22° • Mín 14°</small></div></a>
+
+      <a href="./epec.html" class="card-link">
+        <div class="card"><div class="card-icon">💡</div><h3>EPEC</h3><div class="sub">Electricidad</div><div class="badge badge-orange">⚠️ Cortes programados</div><div class="info">3 cortes activos • Zona Nueva Córdoba<br><small>Actualizado: hace 12 min</small></div></div>
+      </a>
+
+      <a href="./aguas.html" class="card-link"><div class="card"><div class="card-icon">💧</div><h3 style="font-size:19px">Aguas Cordobesas</h3><div class="sub">Agua</div><div class="badge badge-blue">💧 Cortes de agua</div><div class="info">Sin cortes en Centro • 1 corte en Alta Córdoba<br><small>Actualizado: hace 25 min</small></div></div></a>
+      <a href="./cpc.html" class="card-link"><div class="card"><div class="card-icon">🏢</div><h3>CPC</h3><div class="sub" style="font-size:12px">Centro de Participación Comunal</div><div class="badge badge-green">📅 Turnos CPC</div><div class="info">Turnos disponibles hoy • 14 turnos libres<br><small>Próximo: 10:30 hs</small></div></div></a>
+      <a href="./hospitales.html" class="card-link"><div class="card"><div class="card-icon">➕</div><h3>Hospitales</h3><div class="sub">Salud Pública</div><div class="badge badge-green">✚ Turnos hospitales</div><div class="info">Turnos disponibles • Hospital Córdoba<br><small>Guardia: Activa 24hs</small></div></div></a>
+      <a href="./transporte.html" class="card-link"><div class="card"><div class="card-icon">🚌</div><h3>Transporte</h3><div class="sub">Transporte Urbano</div><div class="badge badge-blue">🚌 Mi bondi</div><div class="info">Línea 25 • 8 min | Línea 600 • 12 min<br><small>Frecuencia actualizada</small></div></div></a>
+      <a href="./clima.html" class="card-link"><div class="card"><div class="card-icon">☁️</div><h3>Clima</h3><div class="sub">Clima Córdoba</div><div class="temp">18°C</div><div class="info">☁️ Parcialmente nublado<br>💨 Humedad 65% • Viento 12 km/h<br><small>Hoy Máx 22° • Mín 14°</small></div></div></a>
+
     </div>
   </div>
 </main>
