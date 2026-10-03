@@ -78,6 +78,9 @@
   <button onclick="cerrarModulo('epec')" class="bg-white text-black px-5 py-2 rounded-full font-bold">← Volver</button>
   <h2 class="text-2xl font-bold mt-6 mb-4 text-white">EPEC - Cortes programados</h2>
   
+  <div id="modulo-epec" class="hidden fixed inset-0 bg-[#121212] z-50 p-6 overflow-auto">
+  <button onclick="cerrarModulo('epec')" class="bg-white text-black px-5 py-2 rounded-full font-bold">← Volver</button>
+  <h2 class="text-2xl font-bold mt-6 mb-4 text-white">EPEC - Cortes programados</h2>
   <input id="search" placeholder="Buscá tu barrio..." class="w-full p-3 rounded-xl text-black mb-3">
   <div id="total" class="text-center text-zinc-400 text-sm mb-4"></div>
   <div id="lista-cortes" class="text-white"></div>
@@ -87,7 +90,9 @@
 function abrirModulo(nombre){
   document.getElementById('modulo-'+nombre).classList.remove('hidden');
 }
-<script>
+function cerrarModulo(nombre){
+  document.getElementById('modulo-'+nombre).classList.add('hidden');
+}
 // DATOS DE PRUEBA - después ponemos los reales de EPEC
 const cortesEPEC = [
   { barrio: "Nueva Córdoba", motivo: "Mantenimiento", hora: "8 a 13hs" },
@@ -111,7 +116,7 @@ function mostrar(filtro=""){
 buscador.addEventListener('input', (e)=> mostrar(e.target.value));
 mostrar();
 </script>
-</script>
+
 
 </body>
 </html>
