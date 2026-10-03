@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "cheerio": "^1.0.0"
+    "@sparticuz/chromium": "122.0.0",
+    "puppeteer-core": "22.6.4"
   }
 }
