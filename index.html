@@ -1,65 +1,42 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ondevoy</title>
-<script src="https://cdn.tailwindcss.com"></script>
-</head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Ondevoy</title><script src="https://cdn.tailwindcss.com"></script></head>
 <body class="bg-[#121212] text-white p-6">
 <h1 class="text-2xl font-bold mb-3">Ondevoy</h1>
-<p class="text-zinc-400 mb-6">Todo Córdoba en un solo lugar</p>
-
-<div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-  <div onclick="abrirModulo('epec')" class="bg-yellow-100 text-black rounded-2xl p-4 cursor-pointer">
-    <h3 class="font-bold">EPEC - Cortes programados</h3>
-    <p class="text-xs opacity-80" id="epec-status">Ver cortes reales</p>
-  </div>
-  <div class="bg-blue-400 text-black rounded-2xl p-4"><h3 class="font-bold">Aguas</h3></div>
-  <div class="bg-green-300 text-black rounded-2xl p-4"><h3 class="font-bold">CPC</h3></div>
-  <div class="bg-red-400 text-black rounded-2xl p-4"><h3 class="font-bold">Hospitales</h3></div>
-  <div class="bg-purple-300 rounded-2xl p-4 border-2 border-white/20"><h3 class="font-bold">Transporte</h3></div>
-  <div class="bg-orange-300 text-black rounded-2xl p-4"><h3 class="font-bold">Clima</h3></div>
+<div class="grid grid-cols-2 gap-3">
+  <div onclick="abrirModulo('epec')" class="bg-yellow-100 text-black rounded-2xl p-4 cursor-pointer"><h3 class="font-bold">EPEC</h3><p id="epec-status" class="text-xs">Ver cortes</p></div>
 </div>
 
 <div id="modulo-epec" class="hidden fixed inset-0 bg-[#121212] z-50 p-6 overflow-auto">
   <button onclick="cerrarModulo('epec')" class="bg-white text-black px-5 py-2 rounded-full font-bold">← Volver</button>
   <h2 class="text-2xl font-bold mt-6 mb-4">EPEC - Cortes programados</h2>
   <input id="search" placeholder="Buscá tu barrio..." class="w-full p-3 rounded-xl text-black mb-3">
-  <div id="total" class="text-center text-zinc-400 text-sm mb-4">Cargando cortes reales...</div>
+  <div id="total" class="text-center text-zinc-400 text-sm mb-4">Cargando...</div>
+  <div id="debug" class="text-xs text-red-400 mb-2"></div>
   <div id="lista-cortes"></div>
 </div>
 
 <script>
-function abrirModulo(n){ document.getElementById('modulo-'+n).classList.remove('hidden'); }
-function cerrarModulo(n){ document.getElementById('modulo-'+n).classList.add('hidden'); }
-
-let cortesEPEC = [];
-const lista = document.getElementById('lista-cortes');
-const buscador = document.getElementById('search');
-const total = document.getElementById('total');
-
-function mostrar(filtro=""){
-  lista.innerHTML = "";
-  const f = filtro.toLowerCase();
-  const filtrados = cortesEPEC.filter(c => (c.barrio + c.zona + c.motivo).toLowerCase().includes(f));
-  total.textContent = `${filtrados.length} cortes encontrados`;
-  filtrados.forEach(c => {
-    lista.innerHTML += `<div class="bg-zinc-800 p-4 rounded-xl mb-2"><b class="text-yellow-200">${c.barrio || c.zona}</b><br><span class="text-sm">${c.motivo} - ${c.hora}</span></div>`;
-  });
-}
-
+function abrirModulo(n){document.getElementById('modulo-'+n).classList.remove('hidden')}
+function cerrarModulo(n){document.getElementById('modulo-'+n).classList.add('hidden')}
+let cortesEPEC=[];
+const lista=document.getElementById('lista-cortes'), buscador=document.getElementById('search'), total=document.getElementById('total'), debug=document.getElementById('debug');
+function mostrar(f=""){ lista.innerHTML=""; const fil=cortesEPEC.filter(c=>JSON.stringify(c).toLowerCase().includes(f.toLowerCase())); total.textContent=`${fil.length} cortes encontrados`; fil.forEach(c=>{ lista.innerHTML+=`<div class="bg-zinc-800 p-4 rounded-xl mb-2"><b class="text-yellow-200">${c.barrio||c.zona||'Sin barrio'}</b><br><span class="text-sm">${c.motivo||''} - ${c.hora||c.horario||''}</span></div>` }) }
 async function cargarReales(){
   try{
-    const res = await fetch('/api/scrape?t=' + Date.now());
-    cortesEPEC = await res.json();
-    document.getElementById('epec-status').textContent = `${cortesEPEC.length} cortes hoy`;
+    const res=await fetch('/api/scrape?t='+Date.now());
+    const texto=await res.text();
+    debug.textContent="Respuesta cruda: "+texto.substring(0,200);
+    let data;
+    try{ data=JSON.parse(texto); }catch(e){ throw new Error("No es JSON, es: "+texto.substring(0,100)) }
+    cortesEPEC = Array.isArray(data) ? data : (data.cortes || data.data || data.result || []);
+    if(cortesEPEC.length===0) throw new Error("JSON vacío, mirá debug arriba");
+    document.getElementById('epec-status').textContent=cortesEPEC.length+" cortes hoy";
+    debug.textContent="";
     mostrar();
-  }catch(e){
-    total.textContent = "Error cargando EPEC";
-  }
+  }catch(e){ total.textContent="Error cargando EPEC"; debug.textContent="ERROR: "+e.message; console.error(e); }
 }
-buscador.addEventListener('input', (e)=> mostrar(e.target.value));
+buscador.addEventListener('input',e=>mostrar(e.target.value));
 cargarReales();
 </script>
 </body>
