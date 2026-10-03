@@ -73,8 +73,23 @@
   </div>
 
   <!-- Acá abajo dejá tu script viejo de cortes, no lo borres -->
-  <div id="lista-cortes"></div>
-  <script src="tu-logica-de-cortes.js"></script>
+  <!-- MODULO EPEC ESCONDIDO -->
+<div id="modulo-epec" class="hidden fixed inset-0 bg-[#121212] z-50 p-6 overflow-auto">
+  <button onclick="cerrarModulo('epec')" class="bg-white text-black px-5 py-2 rounded-full font-bold">← Volver</button>
+  <h2 class="text-2xl font-bold mt-6 mb-4 text-white">EPEC - Cortes programados</h2>
+  <div id="lista-cortes" class="text-white"></div>
+</div>
+
+<script>
+function abrirModulo(nombre){
+  document.getElementById('modulo-'+nombre).classList.remove('hidden');
+}
+function cerrarModulo(nombre){
+  document.getElementById('modulo-'+nombre).classList.add('hidden');
+}
+</script>
+
+<script src="tu-logica-de-cortes.js"></script>
 
 </body>
 </html>
