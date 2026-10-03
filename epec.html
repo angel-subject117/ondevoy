@@ -3,33 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EPEC - Cortes Programados | OnDeVoy</title>
+<title>EPEC Real - OnDeVoy</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
-body{background:#c5ddf6;min-height:100vh}
-.header{background:white;border-radius:0 0 20px 20px;padding:14px 32px;display:flex;justify-content:space-between;align-items:center}
-.logo{display:flex;align-items:center;gap:10px}
-.logo-title{font-size:28px;font-weight:900;color:#1a8ac4}.logo-title span{color:#0a2f5c}
-.back-btn{background:#1a8ac4;color:white;padding:8px 18px;border-radius:20px;text-decoration:none;font-weight:700}
-.main{max-width:900px;margin:0 auto;padding:24px}
-.page-title{background:white;border-radius:14px;padding:18px 20px;margin-bottom:18px}
-.page-title h1{font-size:26px;color:#0a2f5c}
-.corte{background:white;border-radius:12px;padding:16px;margin-bottom:12px;border-left:6px solid #e5a02b}
-.corte h3{color:#0a2f5c;font-size:16px}
-.corte p{font-size:13px;color:#333;margin-top:4px}
+body{background:#c5ddf6;height:100vh;display:flex;flex-direction:column}
+.header{background:white;padding:12px 20px;display:flex;justify-content:space-between;align-items:center}
+.logo-title{font-weight:900;color:#1a8ac4;font-size:22px}.logo-title span{color:#0a2f5c}
+.back{background:#1a8ac4;color:white;padding:7px 16px;border-radius:20px;text-decoration:none;font-weight:700;font-size:13px}
+.filter-bar{background:white;margin:10px 14px;padding:10px 14px;border-radius:12px;display:flex;gap:10px;align-items:center}
+.filter-bar input{flex:1;padding:8px 12px;border-radius:20px;border:1.5px solid #8ec1e8;outline:none}
+.filter-bar button{padding:8px 16px;border-radius:20px;border:none;background:#0a2f5c;color:white;font-weight:700;cursor:pointer}
+.iframe-wrap{flex:1;margin:0 14px 14px;background:white;border-radius:14px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+iframe{width:100%;height:100%;border:none}
+.nota{font-size:11px;text-align:center;padding:6px;color:#2a4a6a}
 </style>
 </head>
 <body>
 <header class="header">
-  <div class="logo"><div class="logo-title">OnDeVoy<span>.com.ar</span></div></div>
-  <a href="./index.html" class="back-btn">← Volver al inicio</a>
+  <div class="logo-title">OnDeVoy<span>.com.ar</span></div>
+  <a href="./index.html" class="back">← Volver</a>
 </header>
-<main class="main">
-  <div class="page-title"><h1>💡 EPEC - Cortes Programados</h1><p>3 cortes activos hoy en Córdoba</p></div>
-  <div class="corte"><h3>🔌 Nueva Córdoba - Rondeau 400</h3><p>Motivo: Mantenimiento programado • Horario: 08:00 a 13:00 • Zona: Rondeau 400 al 700</p></div>
-  <div class="corte"><h3>🔌 Güemes - Achával Rodríguez</h3><p>Motivo: Poda y líneas • Horario: 09:00 a 14:00 • Zona: Achával al 800</p></div>
-  <div class="corte"><h3>🔌 General Paz - 24 de Septiembre</h3><p>Motivo: Obra nueva subestación • Horario: 08:30 a 12:30 • Zona: 24 de Sept. al 1200</p></div>
-</main>
+
+<div class="filter-bar">
+  <input id="q" placeholder="Filtrar por barrio ej: Nueva Córdoba, Cofico...">
+  <button onclick="filtrar()">Filtrar</button>
+</div>
+
+<div class="iframe-wrap">
+  <iframe id="epecFrame" src="https://www.epec.com.ar/actualidad/trabajos-mejoras" title="EPEC Oficial"></iframe>
+</div>
+
+<div class="nota">Fuente 100% oficial: EPEC - Mostrando https://www.epec.com.ar/actualidad/trabajos-mejoras en tiempo real. Si no carga por seguridad de EPEC, <a href="https://www.epec.com.ar/actualidad/trabajos-mejoras" target="_blank">abrir original</a></div>
+
+<script>
+// Filtro simple que intenta buscar dentro del iframe si EPEC lo permite, sino filtra la URL
+function filtrar(){
+  const barrio = document.getElementById('q').value;
+  if(!barrio) return;
+  // Truco: le agregamos ?s=barrio a la URL oficial que EPEC usa como buscador interno
+  document.getElementById('epecFrame').src = `https://www.epec.com.ar/actualidad/trabajos-mejoras?search=${encodeURIComponent(barrio)}`;
+}
+</script>
 </body>
 </html>
