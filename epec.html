@@ -1,35 +1,58 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><title>EPEC Real</title>
-<style>body{font-family:sans-serif;background:#c5ddf6} .corte{background:white;margin:10px;padding:12px;border-radius:10px;border-left:5px solid orange}</style>
-</head><body>
-<a href="./index.html">← Volver</a>
-<input id="f" placeholder="Filtrar barrio..." onkeyup="filtrar()" style="width:90%;padding:10px;margin:10px;border-radius:20px;border:1px solid #999">
-<div id="lista">Cargando cortes oficiales de EPEC...</div>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EPEC Real | OnDeVoy</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
+body{background:#c5ddf6;min-height:100vh}
+.header{background:white;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;border-radius:0 0 18px 18px}
+.logo{font-weight:900;color:#1a8ac4;font-size:22px}.logo span{color:#0a2f5c}
+.back{background:#1a8ac4;color:white;padding:7px 16px;border-radius:20px;text-decoration:none;font-weight:700;font-size:13px}
+.main{max-width:900px;margin:0 auto;padding:16px}
+.search{width:100%;padding:12px 16px;border-radius:24px;border:1.5px solid #7ab3dd;outline:none;margin-bottom:14px}
+.card{background:white;border-radius:12px;padding:14px 16px;margin-bottom:10px;border-left:6px solid #e5a02b;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.card h3{font-size:14px;color:#0a2f5c}
+.card p{font-size:12.5px;color:#333;margin-top:4px;line-height:1.35}
+.estado{text-align:center;padding:20px;color:#0a2f5c;font-weight:600}
+</style>
+</head>
+<body>
+<header class="header"><div class="logo">OnDeVoy<span>.com.ar</span></div><a class="back" href="./index.html">← Volver</a></header>
+<main class="main">
+<input id="filtro" class="search" placeholder="Filtrar por barrio... ej: Cofico, Nueva Córdoba" oninput="filtrar()">
+<div id="lista" class="estado">Cargando cortes oficiales de EPEC...</div>
+</main>
 <script>
+let todos = [];
 async function cargar(){
- const url = encodeURIComponent('https://www.epec.com.ar/actualidad/trabajos-mejoras');
- const res = await fetch(`https://api.allorigins.win/get?url=${url}`);
- const data = await res.json();
- const html = data.contents;
- const parser = new DOMParser();
- const doc = parser.parseFromString(html,'text/html');
- const items = doc.querySelectorAll('.trabajo, article, .item-mejora');
- let out = '';
- // fallback: busca todo el texto de cortes
- const texto = doc.body.innerText;
- const lineas = texto.split('\n').filter(l=>l.includes('De ') && l.includes('barrio'));
- lineas.forEach(l=>{
-   out+=`<div class="corte">${l}</div>`;
- });
- if(!out) out = `<div class="corte">${texto.slice(0,2000)}</div>`;
- document.getElementById('lista').innerHTML = out;
- window.cortes = [...document.querySelectorAll('.corte')];
+ try{
+  const res = await fetch('/api/epec');
+  const html = await res.text();
+  const doc = new DOMParser().parseFromString(html,'text/html');
+  // EPEC tiene los cortes en .et_pb_text o article
+  let bloques = [...doc.querySelectorAll('p, li, .et_pb_text_inner')].map(e=>e.innerText.trim()).filter(t=>t.length>30 && t.toLowerCase().includes('de ') && (t.toLowerCase().includes('barrio') || t.toLowerCase().includes('mantenimiento')));
+  if(bloques.length===0){
+    // Plan B: toma todo el texto y corta por líneas
+    bloques = doc.body.innerText.split('\n').filter(l=>l.length>40).slice(0,40);
+  }
+  todos = bloques;
+  render(bloques);
+ } catch(e){
+  document.getElementById('lista').innerHTML = 'EPEC no responde ahora. <a href="https://www.epec.com.ar/actualidad/trabajos-mejoras" target="_blank">Ver original</a>';
+ }
+}
+function render(lista){
+ if(lista.length===0){document.getElementById('lista').innerHTML='No hay cortes para ese barrio';return;}
+ document.getElementById('lista').innerHTML = lista.map(t=>`<div class="card"><p>${t}</p></div>`).join('');
 }
 function filtrar(){
- const q = document.getElementById('f').value.toLowerCase();
- window.cortes.forEach(c=>{
-   c.style.display = c.innerText.toLowerCase().includes(q) ? 'block':'none';
- });
+ const q = document.getElementById('filtro').value.toLowerCase();
+ render(todos.filter(t=>t.toLowerCase().includes(q)));
 }
 cargar();
 </script>
-</body></html>
+</body>
+</html>
