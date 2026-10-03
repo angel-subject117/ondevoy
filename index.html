@@ -4,40 +4,22 @@
 <body class="bg-[#121212] text-white p-6">
 <h1 class="text-2xl font-bold mb-3">Ondevoy</h1>
 <div class="grid grid-cols-2 gap-3">
-  <div onclick="abrirModulo('epec')" class="bg-yellow-100 text-black rounded-2xl p-4 cursor-pointer"><h3 class="font-bold">EPEC</h3><p id="epec-status" class="text-xs">Ver cortes</p></div>
+  <div onclick="abrirModulo('epec')" class="bg-yellow-100 text-black rounded-2xl p-4 cursor-pointer"><h3 class="font-bold">EPEC</h3><p id="epec-status" class="text-xs">Ver cortes reales</p></div>
 </div>
-
 <div id="modulo-epec" class="hidden fixed inset-0 bg-[#121212] z-50 p-6 overflow-auto">
   <button onclick="cerrarModulo('epec')" class="bg-white text-black px-5 py-2 rounded-full font-bold">← Volver</button>
   <h2 class="text-2xl font-bold mt-6 mb-4">EPEC - Cortes programados</h2>
   <input id="search" placeholder="Buscá tu barrio..." class="w-full p-3 rounded-xl text-black mb-3">
-  <div id="total" class="text-center text-zinc-400 text-sm mb-4">Cargando...</div>
-  <div id="debug" class="text-xs text-red-400 mb-2"></div>
+  <div id="total" class="text-center text-zinc-400 text-sm mb-4">Cargando cortes reales de EPEC...</div>
   <div id="lista-cortes"></div>
 </div>
-
 <script>
 function abrirModulo(n){document.getElementById('modulo-'+n).classList.remove('hidden')}
 function cerrarModulo(n){document.getElementById('modulo-'+n).classList.add('hidden')}
-let cortesEPEC=[];
-const lista=document.getElementById('lista-cortes'), buscador=document.getElementById('search'), total=document.getElementById('total'), debug=document.getElementById('debug');
-function mostrar(f=""){ lista.innerHTML=""; const fil=cortesEPEC.filter(c=>JSON.stringify(c).toLowerCase().includes(f.toLowerCase())); total.textContent=`${fil.length} cortes encontrados`; fil.forEach(c=>{ lista.innerHTML+=`<div class="bg-zinc-800 p-4 rounded-xl mb-2"><b class="text-yellow-200">${c.barrio||c.zona||'Sin barrio'}</b><br><span class="text-sm">${c.motivo||''} - ${c.hora||c.horario||''}</span></div>` }) }
-async function cargarReales(){
-  try{
-    const res=await fetch('/api/scrape?t='+Date.now());
-    const texto=await res.text();
-    debug.textContent="Respuesta cruda: "+texto.substring(0,200);
-    let data;
-    try{ data=JSON.parse(texto); }catch(e){ throw new Error("No es JSON, es: "+texto.substring(0,100)) }
-    cortesEPEC = Array.isArray(data) ? data : (data.cortes || data.data || data.result || []);
-    if(cortesEPEC.length===0) throw new Error("JSON vacío, mirá debug arriba");
-    document.getElementById('epec-status').textContent=cortesEPEC.length+" cortes hoy";
-    debug.textContent="";
-    mostrar();
-  }catch(e){ total.textContent="Error cargando EPEC"; debug.textContent="ERROR: "+e.message; console.error(e); }
-}
-buscador.addEventListener('input',e=>mostrar(e.target.value));
-cargarReales();
+let cortesEPEC=[]; const lista=document.getElementById('lista-cortes'), buscador=document.getElementById('search'), total=document.getElementById('total');
+function mostrar(f=""){ lista.innerHTML=""; const fil=cortesEPEC.filter(c=> (c.barrio+' '+c.zona+' '+c.motivo).toLowerCase().includes(f.toLowerCase())); total.textContent=`${fil.length} cortes encontrados`; fil.forEach(c=>{ lista.innerHTML+=`<div class="bg-zinc-800 p-4 rounded-xl mb-2"><b class="text-yellow-200">${c.barrio}</b><br><span class="text-sm">${c.motivo} - ${c.hora}</span><br><span class="text-xs text-zinc-400">${c.zona}</span></div>` }) }
+async function cargarReales(){ try{ const res=await fetch('/api/scrape?t='+Date.now()); const data=await res.json(); cortesEPEC = Array.isArray(data)? data : (data.cortes||[]); if(typeof cortesEPEC[0]==='string'){ cortesEPEC = cortesEPEC.map(s=>({barrio:s, hora:'', motivo:s, zona:''})) } document.getElementById('epec-status').textContent=cortesEPEC.length+' cortes hoy'; mostrar(); }catch(e){ total.textContent='Error cargando EPEC: '+e.message } }
+buscador.addEventListener('input',e=>mostrar(e.target.value)); cargarReales();
 </script>
 </body>
 </html>
