@@ -3,72 +3,58 @@ export default async function handler(req, res) {
     const OFICIAL = 'https://www.epec.com.ar/actualidad/trabajos-mejoras';
     const base = 'https://www.epec.com.ar/';
     const html = await fetch(OFICIAL, { headers: { 'User-Agent': 'Mozilla/5.0' } }).then(r=>r.text());
+    const mainUrlMatch = html.match(/src="(main\.[^"]+\.js)"/);
+    let mainUrl = base + (mainUrlMatch? mainUrlMatch[1] : 'main.19200b3112269040ed7.js');
+    if(mainUrlMatch && mainUrlMatch[1].startsWith('http')) mainUrl = mainUrlMatch[1];
+    if(!mainUrl.startsWith('http')) mainUrl = base + mainUrl;
 
-    // Sacamos los JS reales de EPEC (runtime, main, polyfills)
-    const rawSrcs = [...html.matchAll(/src="([^"]+\.js)"/g)].map(m=>m[1]);
-    const jsUrls = rawSrcs.map(s=>{
-      if(s.startsWith('http')) return s;
-      if(s.startsWith('/')) return base + s.slice(1);
-      return base + s; // runtime.XXX.js -> https://www.epec.com.ar/runtime.XXX.js
-    }).filter(u=>!u.includes('gstatic') &&!u.includes('googlemaps'));
+    const mainJs = await fetch(mainUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } }).then(r=>r.text());
 
-    let apiReal = null;
-    let rawApi = '';
-    let candidatos = [];
-
-    // Leemos el main.js de EPEC para encontrar su fetch interno
-    for (let jsUrl of jsUrls) {
-      try {
-        const js = await fetch(jsUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } }).then(r=>r.text());
-        // buscamos cualquier cosa que parezca endpoint de EPEC
-        const matches = [...js.matchAll(/["']([^"']*trabajo[^"']*|[^"']*interrup[^"']*|[^"']*corte[^"']*)["']/gi)];
-        for (let mm of matches) {
-          let c = mm[1];
-          if(c.length>4 && c.length<120) candidatos.push(c + ' -> de ' + jsUrl.split('/').pop());
-          if(c.includes('/api/') || c.includes('trabajos') || c.includes('interrup')) {
-            if(c.startsWith('/')) c = base + c.slice(1);
-            if(c.startsWith('api/')) c = base + c;
-            if(c.startsWith('http') && c.includes('epec.com.ar')) {
-              try {
-                const rr = await fetch(c, { headers: { 'Accept': 'application/json' } }).then(r=>r.text());
-                if(rr.length>300 && rr.toLowerCase().includes('zona')) {
-                  apiReal = c; rawApi = rr.slice(0,8000); break;
-                }
-              } catch {}
-            }
-          }
-        }
-        if(apiReal) break;
-      } catch {}
+    // Buscamos apiEndpoint = "https://...." dentro del main.js oficial
+    let apiBase = null;
+    let m = mainJs.match(/apiEndpoint\s*[:=]\s*["']([^"']+)["']/);
+    if(m) apiBase = m[1];
+    if(!apiBase){
+      let m2 = mainJs.match(/environment[^}]*api[^"']*["']([^"']+epec[^"']+)["']/i);
+      if(m2) apiBase = m2[1];
     }
+    if(!apiBase) apiBase = 'https://www.epec.com.ar/api/'; // fallback oficial
 
-    // Si no lo encontró en JS, probamos los oficiales más comunes de EPEC
-    const pruebaDirecta = [
-      'https://www.epec.com.ar/api/trabajos-mejoras/list',
-      'https://www.epec.com.ar/api/interrupciones',
-      'https://www.epec.com.ar/api/v1/trabajos',
-      'https://www.epec.com.ar/api/CortesProgramados'
+    if(apiBase.startsWith('/')) apiBase = base + apiBase.slice(1);
+    if(!apiBase.endsWith('/')) apiBase += '/';
+
+    // Probamos los métodos reales que viste: getTrabajosMejora
+    const endpoints = [
+      apiBase + 'TrabajosMejora',
+      apiBase + 'trabajos-mejoras',
+      apiBase + 'TrabajosMejoras',
+      apiBase + 'trabajosmejoras',
+      apiBase + 'InterrupcionesProgramadas',
+      base + 'api/TrabajosMejora'
     ];
-    if(!apiReal){
-      for(let u of pruebaDirecta){
-        try{
-          const txt = await fetch(u, { headers: { 'User-Agent':'Mozilla/5.0','Accept':'application/json' } }).then(r=>r.text());
-          if(txt.length>500 && txt.toLowerCase().includes('zona')){ apiReal=u; rawApi=txt.slice(0,8000); break; }
-        }catch{}
-      }
+
+    let data = null, urlOk = null;
+    for(let u of endpoints){
+      try{
+        const r = await fetch(u, { headers: { 'User-Agent':'Mozilla/5.0','Accept':'application/json' } });
+        const t = await r.text();
+        if(t.length>200 && (t.includes('De:') || t.includes('Zona') || t.includes('Motivo') || t.includes('horario') || t.includes('barrio'))){
+          data = t; urlOk = u; break;
+        }
+        // si es JSON array
+        try{ let j=JSON.parse(t); if(Array.isArray(j) && j.length>0){ data=t; urlOk=u; break; } }catch{}
+      }catch{}
     }
 
     res.setHeader('Access-Control-Allow-Origin','*');
     res.setHeader('Content-Type','application/json');
     return res.status(200).send(JSON.stringify({
       fuente: OFICIAL,
-      html_len: html.length,
-      jsUrls,
-      candidatos: candidatos.slice(0,30),
-      api_real: apiReal,
-      raw: rawApi,
-      total: apiReal?1:0,
-      cortes: []
+      mainJs: mainUrl,
+      apiBase,
+      api_real: urlOk,
+      raw_preview: data? data.slice(0,6000) : mainJs.slice(mainJs.indexOf('apiEndpoint')-100, mainJs.indexOf('apiEndpoint')+400),
+      total: data? 1 : 0
     }));
   } catch(e){
     return res.status(200).send(JSON.stringify({ error: e.message }));
