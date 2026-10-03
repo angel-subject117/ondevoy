@@ -1,24 +1,52 @@
 <!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>EPEC - OnDeVoy</title>
-<style>body{background:#c5ddf6;font-family:sans-serif;margin:0}.top{background:white;padding:12px 20px;display:flex;justify-content:space-between;align-items:center}.logo{font-weight:900;color:#1a8ac4}.logo span{color:#0a2f5c}.btn{background:#1a8ac4;color:white;padding:8px 16px;border-radius:20px;text-decoration:none;font-weight:700}#f{width:90%;max-width:600px;display:block;margin:20px auto;padding:12px 20px;border-radius:30px;border:2px solid #8ec1e8;outline:none}.card{background:white;margin:10px auto;max-width:700px;padding:14px;border-radius:12px;border-left:6px solid #f0a500}</style>
+<style>body{background:#c5ddf6;font-family:sans-serif;margin:0}.top{background:white;padding:12px 20px;display:flex;justify-content:space-between;align-items:center}.logo{font-weight:900;color:#1a8ac4;font-size:20px}.logo span{color:#0a2f5c}.btn{background:#1a8ac4;color:white;padding:8px 16px;border-radius:20px;text-decoration:none;font-weight:700}#f{width:92%;max-width:600px;display:block;margin:20px auto;padding:12px 20px;border-radius:30px;border:2px solid #8ec1e8;outline:none}.card{background:white;margin:10px auto;max-width:700px;padding:14px;border-radius:12px;border-left:6px solid #f0a500;font-size:14px;line-height:1.4}#log{background:#0a2f5c;color:white;padding:10px;margin:10px auto;max-width:700px;border-radius:10px;font-size:12px;white-space:pre-wrap}</style>
 </head><body>
 <div class="top"><div class="logo">OnDeVoy<span>.com.ar</span></div><a class="btn" href="./index.html">← Volver</a></div>
 <input id="f" placeholder="Filtrar por barrio... Cofico, Alberdi" oninput="filtrar()">
-<div id="lista" style="text-align:center;padding:30px;font-weight:700;color:#0a2f5c">Conectando con EPEC oficial...</div>
+<div id="log">Conectando...</div>
+<div id="lista"></div>
 <script>
 let todos=[];
 async function cargar(){
- const res = await fetch('/api/epec');
- const html = await res.text();
- const doc = new DOMParser().parseFromString(html,'text/html');
- let textos = [...doc.querySelectorAll('p')].map(p=>p.innerText.trim()).filter(t=>t.length>30 && t.match(/\d{1,2}:\d{2}/));
- if(textos.length==0){ textos = doc.body.innerText.split('\n').filter(l=>l.length>40).slice(0,80); }
- todos=textos;
- document.getElementById('lista').innerHTML = todos.map(t=>`<div class="card">${t}</div>`).join('');
+ const log = document.getElementById('log');
+ try{
+  const res = await fetch('/api/epec?t='+Date.now());
+  log.textContent = 'API status: '+res.status+' - Leyendo...';
+  const html = await res.text();
+  log.textContent += '\nHTML largo: '+html.length+' caracteres';
+  
+  const doc = new DOMParser().parseFromString(html,'text/html');
+  // EPEC real: todo está en divs con texto largo. Tomamos TODO lo que tenga más de 15 letras
+  let textos = [...doc.querySelectorAll('div, p, li, span')].map(e=>e.innerText.trim()).filter(t=>t.length>40 && t.length<600);
+  // quitar duplicados
+  textos = [...new Set(textos)];
+  // si aún así es poco, tomar líneas del body
+  if(textos.length < 3){
+    textos = doc.body.innerText.split('\n').map(l=>l.trim()).filter(l=>l.length>30);
+  }
+  
+  log.textContent += '\nCortes encontrados: '+textos.length;
+  if(textos.length===0){
+    log.textContent += '\n\n--- RAW EPEC (primeros 1000) ---\n'+html.slice(0,1000);
+    return;
+  }
+  
+  todos=textos;
+  log.style.display='none';
+  render(todos);
+ }catch(e){
+  log.textContent = 'ERROR: '+e+'\nProbá abrir /api/epec directo';
+ }
+}
+function render(arr){
+ document.getElementById('lista').innerHTML = arr.map(t=>`<div class="card">${t.replace(/\n/g,'<br>')}</div>`).join('');
+ if(arr.length===0) document.getElementById('lista').innerHTML = '<div class="card">No se encontró texto, pero el API sí respondió. Copiame lo que dice arriba en azul.</div>';
 }
 function filtrar(){
  const q=document.getElementById('f').value.toLowerCase();
- document.getElementById('lista').innerHTML = todos.filter(t=>t.toLowerCase().includes(q)).map(t=>`<div class="card">${t}</div>`).join('');
+ if(!q){ render(todos); return; }
+ render(todos.filter(t=>t.toLowerCase().includes(q)));
 }
 cargar();
 </script></body></html>
