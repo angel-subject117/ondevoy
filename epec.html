@@ -3,54 +3,61 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EPEC Real | OnDeVoy</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<title>EPEC Oficial | OnDeVoy</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
-body{background:#c5ddf6;min-height:100vh}
-.header{background:white;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;border-radius:0 0 18px 18px}
+body{background:#c5ddf6;font-family:Inter,sans-serif;margin:0}
+.header{background:white;padding:14px 20px;display:flex;justify-content:space-between;align-items:center}
 .logo{font-weight:900;color:#1a8ac4;font-size:22px}.logo span{color:#0a2f5c}
-.back{background:#1a8ac4;color:white;padding:7px 16px;border-radius:20px;text-decoration:none;font-weight:700;font-size:13px}
-.main{max-width:900px;margin:0 auto;padding:16px}
-.search{width:100%;padding:12px 16px;border-radius:24px;border:1.5px solid #7ab3dd;outline:none;margin-bottom:14px}
-.card{background:white;border-radius:12px;padding:14px 16px;margin-bottom:10px;border-left:6px solid #e5a02b;box-shadow:0 2px 6px rgba(0,0,0,.06)}
-.card h3{font-size:14px;color:#0a2f5c}
-.card p{font-size:12.5px;color:#333;margin-top:4px;line-height:1.35}
-.estado{text-align:center;padding:20px;color:#0a2f5c;font-weight:600}
+.back{background:#1a8ac4;color:white;padding:8px 16px;border-radius:20px;text-decoration:none;font-weight:700}
+.wrap{max-width:900px;margin:16px auto;padding:0 14px}
+#buscador{width:100%;padding:12px 18px;border-radius:30px;border:2px solid #8ec1e8;outline:none;font-size:15px}
+.card{background:white;border-radius:12px;padding:14px;margin:10px 0;border-left:6px solid #f0a500;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.card b{color:#0a2f5c}
+#estado{text-align:center;padding:30px;font-weight:700;color:#0a2f5c}
+small{display:block;text-align:center;margin-top:20px;color:#446;font-size:11px}
 </style>
 </head>
 <body>
-<header class="header"><div class="logo">OnDeVoy<span>.com.ar</span></div><a class="back" href="./index.html">← Volver</a></header>
-<main class="main">
-<input id="filtro" class="search" placeholder="Filtrar por barrio... ej: Cofico, Nueva Córdoba" oninput="filtrar()">
-<div id="lista" class="estado">Cargando cortes oficiales de EPEC...</div>
-</main>
+<div class="header"><div class="logo">OnDeVoy<span>.com.ar</span></div><a class="back" href="./index.html">← Volver</a></div>
+<div class="wrap">
+<input id="buscador" placeholder="Filtrar por barrio... Ej: Cofico, Alberdi, Nueva Córdoba" oninput="filtrar()">
+<div id="estado">Leyendo https://www.epec.com.ar/actualidad/trabajos-mejoras ...</div>
+<div id="lista"></div>
+<small>Fuente única y oficial: EPEC. Esta página es un espejo visual de la original.</small>
+</div>
+
 <script>
-let todos = [];
+let cortes = [];
 async function cargar(){
  try{
-  const res = await fetch('/api/epec');
+  const target = 'https://www.epec.com.ar/actualidad/trabajos-mejoras';
+  // proxy que si pasa Cloudflare
+  const res = await fetch('https://corsproxy.io/?' + encodeURIComponent(target));
   const html = await res.text();
   const doc = new DOMParser().parseFromString(html,'text/html');
-  // EPEC tiene los cortes en .et_pb_text o article
-  let bloques = [...doc.querySelectorAll('p, li, .et_pb_text_inner')].map(e=>e.innerText.trim()).filter(t=>t.length>30 && t.toLowerCase().includes('de ') && (t.toLowerCase().includes('barrio') || t.toLowerCase().includes('mantenimiento')));
-  if(bloques.length===0){
-    // Plan B: toma todo el texto y corta por líneas
-    bloques = doc.body.innerText.split('\n').filter(l=>l.length>40).slice(0,40);
-  }
-  todos = bloques;
-  render(bloques);
- } catch(e){
-  document.getElementById('lista').innerHTML = 'EPEC no responde ahora. <a href="https://www.epec.com.ar/actualidad/trabajos-mejoras" target="_blank">Ver original</a>';
+  const textoCompleto = doc.body.innerText;
+  
+  // EPEC escribe tipo: "De 08:00 a 12:00 - Barrio Cofico..."
+  const lineas = textoCompleto.split('\n').map(l=>l.trim()).filter(l=>l.length>20);
+  // buscamos bloques que tengan horario y barrio
+  const utiles = lineas.filter(l=> /\d{1,2}:\d{2}/.test(l) );
+  
+  cortes = utiles.slice(0,100); // primeros 100 cortes reales
+  if(cortes.length===0) throw 'vacío';
+  
+  document.getElementById('estado').style.display='none';
+  render(cortes);
+ }catch(e){
+  document.getElementById('estado').innerHTML = 'EPEC tardó en responder, probá recargar. <br><a href="https://www.epec.com.ar/actualidad/trabajos-mejoras" target="_blank">Ver página oficial directa</a>';
  }
 }
-function render(lista){
- if(lista.length===0){document.getElementById('lista').innerHTML='No hay cortes para ese barrio';return;}
- document.getElementById('lista').innerHTML = lista.map(t=>`<div class="card"><p>${t}</p></div>`).join('');
+function render(arr){
+ document.getElementById('lista').innerHTML = arr.map(t=>`<div class="card">${t}</div>`).join('');
 }
 function filtrar(){
- const q = document.getElementById('filtro').value.toLowerCase();
- render(todos.filter(t=>t.toLowerCase().includes(q)));
+ const q = document.getElementById('buscador').value.toLowerCase();
+ if(!q){ render(cortes); return; }
+ render(cortes.filter(c=>c.toLowerCase().includes(q)));
 }
 cargar();
 </script>
