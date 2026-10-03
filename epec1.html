@@ -1,1 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OnDevoy - Cortes EPEC</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#91a9d9;color:#1a1a1a;padding:20px}
+  .container{max-width:900px;margin:0 auto}
+  h1{font-size:28px;text-align:center;margin:20px 0 8px}
+  p.sub{text-align:center;color:#666;margin-bottom:20px}
+  #search{width:100%;padding:14px 18px;border:2px solid #e5e7eb;border-radius:12px;font-size:16px;outline:none;margin-bottom:12px}
+  #search:focus{border-color:#111}
+  #total{text-align:center;color:#666;font-size:14px;margin-bottom:16px}
+  .corte{background:white;padding:14px 16px;border-radius:10px;margin-bottom:10px;border:1px solid #eef0f3;line-height:1.4;font-size:14px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+  .corte b{color:#111}
+  .empty{text-align:center;padding:40px;color:#888}
+  footer{text-align:center;margin-top:30px;color:#999;font-size:12px}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>⚡OnDeVoy - Cortes Programados EPEC⚡</h1>
+  <p class="sub">Buscá por localidad o por fecha</p>
+  
+  <input id="search" type="text" placeholder="Ej: Tancacha, James Craik, Rio Tercero, 02/10/2026, 01/10/2026...">
+  <div id="total">Cargando...</div>
+  <div id="lista"></div>
+  <footer>Actualizado desde EPEC - www.ondevoy.com.ar</footer>
+</div>
 
+<script>
+  let todos = [];
+  const listaEl = document.getElementById('lista');
+  const totalEl = document.getElementById('total');
+  const searchEl = document.getElementById('search');
+
+  async function cargar(){
+    try{
+      const r = await fetch('/api/scrape?_=' + Date.now());
+      const j = await r.json();
+      todos = j.cortes || [];
+      // Ordenar por fecha
+      todos.sort();
+      render(todos);
+    }catch(e){
+      totalEl.innerText = 'Error al cargar cortes';
+      listaEl.innerHTML = '<div class="empty">No se pudo conectar con EPEC. Intentá recargar.</div>';
+    }
+  }
+
+  function render(arr){
+    totalEl.innerText = arr.length + ' cortes encontrados';
+    if(arr.length === 0){
+      listaEl.innerHTML = '<div class="empty">No hay cortes para esa búsqueda.<br>Probá con: Tancacha, James Craik, 02/10/2026</div>';
+      return;
+    }
+    listaEl.innerHTML = arr.map(texto => {
+      // Resalta fecha y localidad
+      return `<div class="corte">${texto}</div>`;
+    }).join('');
+  }
+
+  searchEl.addEventListener('input', () => {
+    const q = searchEl.value.toLowerCase().trim();
+    if(!q){
+      render(todos);
+      return;
+    }
+    const filtrados = todos.filter(c => c.toLowerCase().includes(q));
+    render(filtrados);
+  });
+
+  cargar();
+</script>
+</body>
+</html>
