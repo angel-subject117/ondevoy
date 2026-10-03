@@ -3,67 +3,64 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ondevoy - Cortes EPEC</title>
+<title>Ondevoy</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui; background:#121212; color:#fff; padding:20px}
-</style>
 </head>
 <body class="bg-[#121212] text-white p-6">
-
 <h1 class="text-2xl font-bold mb-3">Ondevoy</h1>
-<p class="text-gray-400 mb-6">Todo Córdoba en un solo lugar</p>
+<p class="text-zinc-400 mb-6">Todo Córdoba en un solo lugar</p>
 
-<!-- TARJETITAS -->
 <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
   <div onclick="abrirModulo('epec')" class="bg-yellow-100 text-black rounded-2xl p-4 cursor-pointer">
     <h3 class="font-bold">EPEC - Cortes programados</h3>
-    <p class="text-xs opacity-80" id="epec-status">Ver cortes</p>
+    <p class="text-xs opacity-80" id="epec-status">Ver cortes reales</p>
   </div>
-  <div class="bg-blue-400 text-black rounded-2xl p-4"><h3 class="font-bold">Aguas</h3><p class="text-xs opacity-80">Ver cortes</p></div>
-  <div class="bg-green-300 text-black rounded-2xl p-4"><h3 class="font-bold">CPC</h3><p class="text-xs opacity-80">Turnos CPC</p></div>
-  <div class="bg-red-400 text-black rounded-2xl p-4"><h3 class="font-bold">Hospitales</h3><p class="text-xs opacity-80">Turnos y guardias</p></div>
-  <div class="bg-purple-300 text-white rounded-2xl p-4 border-2 border-white/20"><h3 class="font-bold">Transporte</h3><p class="text-xs opacity-80">Cuando llega</p></div>
-  <div class="bg-orange-300 text-black rounded-2xl p-4"><h3 class="font-bold">Clima</h3><p class="text-xs opacity-80">Alerta hoy</p></div>
+  <div class="bg-blue-400 text-black rounded-2xl p-4"><h3 class="font-bold">Aguas</h3></div>
+  <div class="bg-green-300 text-black rounded-2xl p-4"><h3 class="font-bold">CPC</h3></div>
+  <div class="bg-red-400 text-black rounded-2xl p-4"><h3 class="font-bold">Hospitales</h3></div>
+  <div class="bg-purple-300 rounded-2xl p-4 border-2 border-white/20"><h3 class="font-bold">Transporte</h3></div>
+  <div class="bg-orange-300 text-black rounded-2xl p-4"><h3 class="font-bold">Clima</h3></div>
 </div>
 
-<!-- MODULO EPEC -->
 <div id="modulo-epec" class="hidden fixed inset-0 bg-[#121212] z-50 p-6 overflow-auto">
   <button onclick="cerrarModulo('epec')" class="bg-white text-black px-5 py-2 rounded-full font-bold">← Volver</button>
   <h2 class="text-2xl font-bold mt-6 mb-4">EPEC - Cortes programados</h2>
   <input id="search" placeholder="Buscá tu barrio..." class="w-full p-3 rounded-xl text-black mb-3">
-  <div id="total" class="text-center text-zinc-400 text-sm mb-4"></div>
-  <div id="lista-cortes" class="text-white"></div>
+  <div id="total" class="text-center text-zinc-400 text-sm mb-4">Cargando cortes reales...</div>
+  <div id="lista-cortes"></div>
 </div>
 
 <script>
-function abrirModulo(nombre){
-  document.getElementById('modulo-'+nombre).classList.remove('hidden');
-}
-function cerrarModulo(nombre){
-  document.getElementById('modulo-'+nombre).classList.add('hidden');
-}
+function abrirModulo(n){ document.getElementById('modulo-'+n).classList.remove('hidden'); }
+function cerrarModulo(n){ document.getElementById('modulo-'+n).classList.add('hidden'); }
 
-const cortesEPEC = [
-  { barrio: "Nueva Córdoba", motivo: "Mantenimiento", hora: "8 a 13hs" },
-  { barrio: "Centro", motivo: "Poda", hora: "9 a 12hs" },
-  { barrio: "Alberdi", motivo: "Obras", hora: "8 a 11hs" }
-];
+let cortesEPEC = [];
 const lista = document.getElementById('lista-cortes');
 const buscador = document.getElementById('search');
 const total = document.getElementById('total');
+
 function mostrar(filtro=""){
   lista.innerHTML = "";
-  const filtrados = cortesEPEC.filter(c => c.barrio.toLowerCase().includes(filtro.toLowerCase()));
+  const f = filtro.toLowerCase();
+  const filtrados = cortesEPEC.filter(c => (c.barrio + c.zona + c.motivo).toLowerCase().includes(f));
   total.textContent = `${filtrados.length} cortes encontrados`;
   filtrados.forEach(c => {
-    lista.innerHTML += `<div class="bg-zinc-800 p-4 rounded-xl mb-2"><b>${c.barrio}</b><br>${c.motivo} - ${c.hora}</div>`;
+    lista.innerHTML += `<div class="bg-zinc-800 p-4 rounded-xl mb-2"><b class="text-yellow-200">${c.barrio || c.zona}</b><br><span class="text-sm">${c.motivo} - ${c.hora}</span></div>`;
   });
 }
-buscador.addEventListener('input', (e)=> mostrar(e.target.value));
-mostrar();
-</script>
 
+async function cargarReales(){
+  try{
+    const res = await fetch('/api/scrape?t=' + Date.now());
+    cortesEPEC = await res.json();
+    document.getElementById('epec-status').textContent = `${cortesEPEC.length} cortes hoy`;
+    mostrar();
+  }catch(e){
+    total.textContent = "Error cargando EPEC";
+  }
+}
+buscador.addEventListener('input', (e)=> mostrar(e.target.value));
+cargarReales();
+</script>
 </body>
 </html>
