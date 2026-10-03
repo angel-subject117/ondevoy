@@ -87,9 +87,29 @@
 function abrirModulo(nombre){
   document.getElementById('modulo-'+nombre).classList.remove('hidden');
 }
-function cerrarModulo(nombre){
-  document.getElementById('modulo-'+nombre).classList.add('hidden');
+<script>
+// DATOS DE PRUEBA - después ponemos los reales de EPEC
+const cortesEPEC = [
+  { barrio: "Nueva Córdoba", motivo: "Mantenimiento", hora: "8 a 13hs" },
+  { barrio: "Centro", motivo: "Poda", hora: "9 a 12hs" },
+  { barrio: "Alberdi", motivo: "Obras", hora: "8 a 11hs" }
+];
+
+const lista = document.getElementById('lista-cortes');
+const buscador = document.getElementById('search');
+const total = document.getElementById('total');
+
+function mostrar(filtro=""){
+  lista.innerHTML = "";
+  const filtrados = cortesEPEC.filter(c => c.barrio.toLowerCase().includes(filtro.toLowerCase()));
+  total.textContent = `${filtrados.length} cortes encontrados`;
+  filtrados.forEach(c => {
+    lista.innerHTML += `<div class="bg-zinc-800 p-4 rounded-xl mb-2"><b>${c.barrio}</b><br>${c.motivo} - ${c.hora}</div>`;
+  });
 }
+
+buscador.addEventListener('input', (e)=> mostrar(e.target.value));
+mostrar();
 </script>
 
 </body>
