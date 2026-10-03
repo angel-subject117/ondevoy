@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OnDeVoy.com.ar - Todo Córdoba en un solo lugar</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
+body{background:#c5ddf6;min-height:100vh}
+.header{background:white;border-radius:0 0 20px 20px;padding:14px 32px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,0.05)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-title{font-size:32px;font-weight:900;color:#1a8ac4;letter-spacing:-0.5px}
+.logo-title span{color:#0a2f5c}
+.logo-sub{font-size:13px;color:#5a8fb8;font-weight:500;margin-top:2px}
+.nav{display:flex;align-items:center;gap:22px;font-size:14px}
+.nav a{text-decoration:none;color:#4a4a4a;padding:6px 12px;border-radius:20px;font-weight:500}
+.nav a.active{background:#8ec1e8;color:white;font-weight:700;padding:6px 16px}
+.nav .cr{background:#6faad8;color:white;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px}
+.main{max-width:1280px;margin:0 auto;padding:28px 24px 10px}
+.title-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
+.title h1{font-size:30px;font-weight:800;color:#102a5a;line-height:1.1}
+.title p{font-size:14px;color:#2a2a2a;margin-top:4px}
+.location-badge{border:1.5px solid #5a9bc8;color:#2a5a8a;background:rgba(255,255,255,0.4);padding:6px 14px;border-radius:20px;font-size:13px;display:flex;gap:6px}
+.services-box{background:rgba(225,235,250,0.7);border-radius:20px;padding:18px;border:1px solid rgba(255,255,255,0.6)}
+.services-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.services-header h2{font-size:26px;font-weight:800;color:#0a2a5c}
+.services-header .meta{font-size:13px;color:#2a5a8a;font-weight:500}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{background:white;border-radius:14px;padding:14px 12px;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,0.06);border:1.5px solid #d6e6f5;cursor:pointer;transition:0.15s}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,0.1)}
+.card-icon{width:56px;height:56px;background:#d6e9f7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:28px}
+.card h3{font-size:20px;font-weight:800;color:#0a1f44;line-height:1.1}
+.card .sub{font-size:13px;color:#1a1a1a;font-weight:500;margin-bottom:8px}
+.badge{display:inline-flex;gap:5px;padding:4px 12px;border-radius:14px;font-size:12px;font-weight:700;color:white;margin-bottom:8px}
+.badge-orange{background:#e5a02b}.badge-blue{background:#2d7fc0}.badge-green{background:#6ab04c}
+.card .info{font-size:11.5px;color:#111;font-weight:600;line-height:1.35}
+.card .info small{font-weight:400;font-size:11px;color:#222}
+.card .temp{font-size:34px;font-weight:900;color:#0a1f44;line-height:1;margin:2px 0}
+.footer{text-align:center;padding:18px 10px 12px;font-size:11.5px;color:#1a1a1a}
+.footer div{margin-top:4px;color:#2a4a6a}
+@media(max-width:900px){.grid{grid-template-columns:1fr}.title-row{flex-direction:column;gap:10px}.header{flex-direction:column;gap:12px}}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="logo">
+    <svg viewBox="0 0 48 60" width="52" height="52"><path d="M24 0 C10 0 0 10 0 22 C0 38 24 60 24 60 C24 60 48 38 48 22 C48 10 38 0 24 0 Z" fill="#d6ecff" stroke="#3a8ac0" stroke-width="2.5"/><circle cx="24" cy="20" r="11" fill="white" stroke="#3a8ac0" stroke-width="2.2"/></svg>
+    <div>
+      <div class="logo-title">OnDeVoy<span>.com.ar</span></div>
+      <div class="logo-sub">Todo Córdoba en un solo lugar</div>
+    </div>
+  </div>
+  <nav class="nav">
+    <a href="index.html" class="active">Inicio</a>
+    <a href="#">Servicios</a>
+    <a href="#">🔔 Alertas</a>
+    <a href="#">Ayuda</a>
+    <div class="cr">CR</div>
+  </nav>
+</header>
+
+<main class="main">
+  <div class="title-row">
+    <div class="title">
+      <h1>Panel de Servicios de Córdoba</h1>
+      <p>Consulta en tiempo real el estado de los servicios públicos de la ciudad. Actualizado hoy,<br>02 oct 2024 • 09:15hs</p>
+    </div>
+    <div class="location-badge">📍 Córdoba, Argentina</div>
+  </div>
+
+  <div class="services-box">
+    <div class="services-header">
+      <h2>Servicios Disponibles</h2>
+      <div class="meta">6 servicios &nbsp;•&nbsp; Actualizaciones en vivo</div>
+    </div>
+
+    <div class="grid">
+      <div class="card" onclick="location.href='epec.html'">
+        <div class="card-icon">💡</div>
+        <h3>EPEC</h3>
+        <div class="sub">Electricidad</div>
+        <div class="badge badge-orange">⚠️ Cortes programados</div>
+        <div class="info">3 cortes activos • Zona Nueva Córdoba<br><small>Actualizado: hace 12 min</small></div>
+      </div>
+
+      <div class="card" onclick="location.href='aguas.html'">
+        <div class="card-icon">💧</div>
+        <h3 style="font-size:19px">Aguas Cordobesas</h3>
+        <div class="sub">Agua</div>
+        <div class="badge badge-blue">💧 Cortes de agua</div>
+        <div class="info">Sin cortes en Centro • 1 corte en Alta Córdoba<br><small>Actualizado: hace 25 min</small></div>
+      </div>
+
+      <div class="card" onclick="location.href='cpc.html'">
+        <div class="card-icon">🏢</div>
+        <h3>CPC</h3>
+        <div class="sub" style="font-size:12px">Centro de Participación Comunal</div>
+        <div class="badge badge-green">📅 Turnos CPC</div>
+        <div class="info">Turnos disponibles hoy • 14 turnos libres<br><small>Próximo: 10:30 hs</small></div>
+      </div>
+
+      <div class="card" onclick="location.href='hospitales.html'">
+        <div class="card-icon">➕</div>
+        <h3>Hospitales</h3>
+        <div class="sub">Salud Pública</div>
+        <div class="badge badge-green">✚ Turnos hospitales</div>
+        <div class="info">Turnos disponibles • Hospital Córdoba<br><small>Guardia: Activa 24hs</small></div>
+      </div>
+
+      <div class="card" onclick="location.href='transporte.html'">
+        <div class="card-icon">🚌</div>
+        <h3>Transporte</h3>
+        <div class="sub">Transporte Urbano</div>
+        <div class="badge badge-blue">🚌 Mi bondi</div>
+        <div class="info">Línea 25 • 8 min | Línea 600 • 12 min<br><small>Frecuencia actualizada</small></div>
+      </div>
+
+      <div class="card" onclick="location.href='clima.html'">
+        <div class="card-icon">☁️</div>
+        <h3>Clima</h3>
+        <div class="sub">Clima Córdoba</div>
+        <div class="temp">18°C</div>
+        <div class="info">☁️ Parcialmente nublado<br>💨 Humedad 65% • Viento 12 km/h<br><small>Hoy Máx 22° • Mín 14°</small></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <strong>OnDeVoy.com.ar</strong> • Datos oficiales de la Municipalidad de Córdoba • Soporte: ayuda@ondevoy.com.ar
+  <div>Privacidad • Términos • Mapa del sitio</div>
+</footer>
+
+<!-- OnDeVoy v1.0 - index.html HOME 6 tarjetas - listo para conectar epec.html / aguas.html / cpc.html -->
+</body>
+</html>
