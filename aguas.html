@@ -6,9 +6,12 @@
 <title>Cortes de Agua - OnDeVoy Córdoba</title>
 <style>
 body{font-family:system-ui,sans-serif;background:#f5f7fb;margin:0;padding:20px}
-.container{max-width:900px;margin:auto;background:white;border-radius:16px;padding:20px;box-shadow:0 4px 20px rgba(0,0,0,.08)}
-h1{display:flex;align-items:center;gap:10px}
+.container{max-width:1000px;margin:auto;background:white;border-radius:16px;padding:20px;box-shadow:0 4px 20px rgba(0,0,0,.08)}
+.header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.btn-volver{background:#0f172a;color:white;padding:10px 16px;border-radius:10px;text-decoration:none;font-size:14px;font-weight:600}
 .badge{background:#e3f2fd;color:#1565c0;padding:4px 10px;border-radius:20px;font-size:12px}
+.filtros{margin-top:18px;display:flex;gap:12px;flex-wrap:wrap}
+.filtros input,.filtros select{padding:10px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px;flex:1;min-width:200px}
 table{width:100%;border-collapse:collapse;margin-top:16px}
 th{background:#f0f4ff;text-align:left;padding:10px;font-size:13px}
 td{padding:10px;border-bottom:1px solid #eee;font-size:13px}
@@ -17,37 +20,58 @@ td{padding:10px;border-bottom:1px solid #eee;font-size:13px}
 </head>
 <body>
 <div class="container">
-<h1>🤖💧 Cortes de Aguas Cordobesas <span class="badge" id="count">Cargando...</span></h1>
-<p style="color:#666;font-size:14px">Datos oficiales ArcGIS - GESTION_CORTES_WKID102100</p>
-<div id="loader" class="loader">Buscando cortes programados...</div>
+<div class="header">
+<h1 style="margin:0">💧 Cortes de Agua <span class="badge" id="count">Cargando...</span></h1>
+<a href="/" class="btn-volver">⬅ Volver a OnDeVoy</a>
+</div>
+<p style="color:#666;font-size:14px">Datos oficiales ArcGIS Aguas Cordobesas</p>
+<div class="filtros">
+<input type="text" id="filtroBarrio" placeholder="🔍 Filtrar por barrio Ej: Alberdi, Centro...">
+<select id="filtroEstado"><option value="">Todos los estados</option><option value="En Espera">En Espera</option><option value="Finalizado">Finalizado</option><option value="Programado">Programado</option></select>
+</div>
+<div id="loader" class="loader">Buscando cortes...</div>
 <table id="tabla" style="display:none">
-<thead><tr><th>N°</th><th>Barrios</th><th>Inicio</th><th>Fin</th><th>Estado</th><th>Motivo</th></tr></thead>
+<thead><tr><th>N°</th><th>Barrios / Dirección</th><th>Inicio</th><th>Fin</th><th>Estado</th><th>Motivo</th></tr></thead>
 <tbody id="tbody"></tbody>
 </table>
-<div id="error" style="display:none;color:red;padding:20px"></div>
+<div id="sinResultados" style="display:none;text-align:center;padding:30px;color:#666">No hay resultados para ese filtro 😕</div>
 </div>
 <script>
 const API = "/api/aguas";
+let todosLosCortes = [];
 async function cargar(){
- try{
-   const r = await fetch(API);
-   const data = await r.json();
-   const features = data.features || [];
-   document.getElementById("loader").style.display="none";
-   document.getElementById("tabla").style.display="table";
-   document.getElementById("count").textContent = features.length + " cortes";
-   const tbody = document.getElementById("tbody");
-   features.forEach(f=>{
-     const a = f.attributes;
-     const tr = document.createElement("tr");
-     tr.innerHTML = `<td><b>${a.Numero||"-"}</b></td><td>${(a.Barrios_Afectados||"-").substring(0,120)}</td><td>${new Date(a.Fecha_Inicio_Prevista).toLocaleString("es-AR")}</td><td>${new Date(a.Fecha_Fin_Prevista).toLocaleString("es-AR")}</td><td>${a.Estado_Corte||"-"}</td><td>${a.causante||a.Tipo||"-"}</td>`;
-     tbody.appendChild(tr);
-   });
- }catch(e){
-   document.getElementById("error").style.display="block";
-   document.getElementById("error").textContent = "CORS bloqueado, usar /api/aguas en Vercel: " + e.message;
- }
+  const r = await fetch(API);
+  const data = await r.json();
+  todosLosCortes = data.features || [];
+  document.getElementById("loader").style.display="none";
+  render(todosLosCortes);
 }
+function render(lista){
+  const tbody = document.getElementById("tbody");
+  tbody.innerHTML = "";
+  document.getElementById("tabla").style.display = lista.length ? "table" : "none";
+  document.getElementById("sinResultados").style.display = lista.length ? "none" : "block";
+  document.getElementById("count").textContent = lista.length + " cortes";
+  lista.forEach(f=>{
+    const a = f.attributes;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td><b>${a.Numero||"-"}</b></td><td>${a.Barrios_Afectados||a.Direccion||"-"}</td><td>${a.Fecha_Inicio_Prevista ? new Date(a.Fecha_Inicio_Prevista).toLocaleString("es-AR") : "-"}</td><td>${a.Fecha_Fin_Prevista ? new Date(a.Fecha_Fin_Prevista).toLocaleString("es-AR") : "-"}</td><td>${a.Estado_Corte||"-"}</td><td>${a.causante||"-"}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+function filtrar(){
+  const texto = document.getElementById("filtroBarrio").value.toLowerCase();
+  const estado = document.getElementById("filtroEstado").value;
+  const filtrados = todosLosCortes.filter(f=>{
+    const a = f.attributes;
+    const barrio = (a.Barrios_Afectados||a.Direccion||"").toLowerCase();
+    const est = (a.Estado_Corte||"").trim();
+    return barrio.includes(texto) && (!estado || est===estado);
+  });
+  render(filtrados);
+}
+document.getElementById("filtroBarrio").addEventListener("input",filtrar);
+document.getElementById("filtroEstado").addEventListener("change",filtrar);
 cargar();
 </script>
 </body>
