@@ -1,1 +1,54 @@
-
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cortes de Agua - OnDeVoy Córdoba</title>
+<style>
+body{font-family:system-ui,sans-serif;background:#f5f7fb;margin:0;padding:20px}
+.container{max-width:900px;margin:auto;background:white;border-radius:16px;padding:20px;box-shadow:0 4px 20px rgba(0,0,0,.08)}
+h1{display:flex;align-items:center;gap:10px}
+.badge{background:#e3f2fd;color:#1565c0;padding:4px 10px;border-radius:20px;font-size:12px}
+table{width:100%;border-collapse:collapse;margin-top:16px}
+th{background:#f0f4ff;text-align:left;padding:10px;font-size:13px}
+td{padding:10px;border-bottom:1px solid #eee;font-size:13px}
+.loader{text-align:center;padding:40px}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🤖💧 Cortes de Aguas Cordobesas <span class="badge" id="count">Cargando...</span></h1>
+<p style="color:#666;font-size:14px">Datos oficiales ArcGIS - GESTION_CORTES_WKID102100</p>
+<div id="loader" class="loader">Buscando cortes programados...</div>
+<table id="tabla" style="display:none">
+<thead><tr><th>N°</th><th>Barrios</th><th>Inicio</th><th>Fin</th><th>Estado</th><th>Motivo</th></tr></thead>
+<tbody id="tbody"></tbody>
+</table>
+<div id="error" style="display:none;color:red;padding:20px"></div>
+</div>
+<script>
+const API = "https://arcgis.aguascordobesas.com.ar/arcgis/rest/services/rmt_ctrl/GESTION_CORTES_WKID102100/MapServer/0/query?f=json&where=1=1&outFields=*&returnGeometry=false&resultRecordCount=100&orderByFields=Fecha_Inicio_Prevista DESC";
+async function cargar(){
+ try{
+   const r = await fetch(API);
+   const data = await r.json();
+   const features = data.features || [];
+   document.getElementById("loader").style.display="none";
+   document.getElementById("tabla").style.display="table";
+   document.getElementById("count").textContent = features.length + " cortes";
+   const tbody = document.getElementById("tbody");
+   features.forEach(f=>{
+     const a = f.attributes;
+     const tr = document.createElement("tr");
+     tr.innerHTML = `<td><b>${a.Numero||"-"}</b></td><td>${(a.Barrios_Afectados||"-").substring(0,120)}</td><td>${new Date(a.Fecha_Inicio_Prevista).toLocaleString("es-AR")}</td><td>${new Date(a.Fecha_Fin_Prevista).toLocaleString("es-AR")}</td><td>${a.Estado_Corte||"-"}</td><td>${a.causante||a.Tipo||"-"}</td>`;
+     tbody.appendChild(tr);
+   });
+ }catch(e){
+   document.getElementById("error").style.display="block";
+   document.getElementById("error").textContent = "CORS bloqueado, usar /api/aguas en Vercel: " + e.message;
+ }
+}
+cargar();
+</script>
+</body>
+</html>
