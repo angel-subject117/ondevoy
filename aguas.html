@@ -27,7 +27,7 @@ td{padding:10px;border-bottom:1px solid #eee;font-size:13px}
 <div id="error" style="display:none;color:red;padding:20px"></div>
 </div>
 <script>
-const API = "https://arcgis.aguascordobesas.com.ar/arcgis/rest/services/rmt_ctrl/GESTION_CORTES_WKID102100/MapServer/0/query?f=json&where=1=1&outFields=*&returnGeometry=false&resultRecordCount=100&orderByFields=Fecha_Inicio_Prevista DESC";
+const API = "/api/aguas";
 async function cargar(){
  try{
    const r = await fetch(API);
