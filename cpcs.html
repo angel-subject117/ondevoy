@@ -1,1 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CPCs - OnDeVoy Córdoba</title>
+<style>
+  :root{--azul:#0052cc;--gris:#f5f6f8;--borde:#e5e7eb}
+  *{box-sizing:border-box;font-family:Inter,system-ui,sans-serif}
+  body{margin:0;background:var(--gris);color:#111}
+  header{background:#fff;border-bottom:1px solid var(--borde);padding:14px 18px;position:sticky;top:0;z-index:10}
+  header a{color:var(--azul);text-decoration:none;font-weight:700}
+  .wrap{max-width:900px;margin:0 auto;padding:18px}
+  .buscador{width:100%;padding:12px 14px;border:1px solid var(--borde);border-radius:12px;font-size:16px;margin:12px 0}
+  .filtros{display:flex;gap:8px;overflow:auto;padding-bottom:8px}
+  .chip{white-space:nowrap;padding:6px 12px;border:1px solid var(--borde);border-radius:20px;background:#fff;cursor:pointer;font-size:14px}
+  .chip.active{background:var(--azul);color:#fff;border-color:var(--azul)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px;margin-top:14px}
+  .card{background:#fff;border:1px solid var(--borde);border-radius:16px;padding:14px}
+  .card h3{margin:0 0 4px;font-size:17px}
+  .card small{color:#666}
+  .tag{display:inline-block;background:#eef2ff;color:#3730a3;border-radius:6px;padding:2px 6px;font-size:11px;margin:4px 4px 0 0}
+  .btn{display:block;width:100%;margin-top:10px;background:var(--azul);color:#fff;text-align:center;padding:10px;border-radius:10px;text-decoration:none;font-weight:600}
+  .btn-outline{background:#fff;color:var(--azul);border:1px solid var(--azul)}
+  .estado{margin-top:10px;background:#f0fdf4;border:1px solid #bbf7d0;padding:8px;border-radius:8px;font-size:13px}
+  .report{display:flex;gap:6px;margin-top:8px}
+  .report button{flex:1;padding:6px;border-radius:8px;border:1px solid var(--borde);background:#fff;cursor:pointer;font-size:13px}
+  .detalle{background:#fff;border-radius:16px;padding:18px;border:1px solid var(--borde)}
+  .volver{display:inline-block;margin-bottom:12px;color:var(--azul);text-decoration:none}
+</style>
+</head>
+<body>
+<header><a href="/">← OnDeVoy</a> <span style="margin-left:12px;font-weight:600">CPCs Córdoba</span></header>
+<div class="wrap">
+  <div id="app">Cargando CPCs...</div>
+</div>
 
+<script>
+const API = '/api/cpcs';
+const params = new URLSearchParams(location.search);
+const id = params.get('id');
+
+async function load(){
+  const res = await fetch(API);
+  const data = await res.json();
+  
+  if(id){
+    const cpc = data.find(c=>c.id===id) || data;
+    renderDetalle(cpc);
+  } else {
+    renderLista(data);
+  }
+}
+
+function renderLista(cpcs){
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <h2 style="margin:0">17 CPCs de Córdoba</h2>
+    <p style="color:#666;margin:4px 0 0">Tocá uno para ver dirección, horarios y sacar turno en MiDocta</p>
+    <input id="q" class="buscador" placeholder="Buscar por barrio o dirección... Ej: Argüello, Colón, Empalme">
+    <div class="filtros" id="filtros"></div>
+    <div class="grid" id="grid"></div>
+  `;
+  const zonas = [...new Set(cpcs.map(c=>c.zona))];
+  const filtrosEl = document.getElementById('filtros');
+  filtrosEl.innerHTML = `<div class="chip active" data-z="todos">Todos</div>` + zonas.map(z=>`<div class="chip" data-z="${z}">${z}</div>`).join('');
+  
+  const grid = document.getElementById('grid');
+  const qEl = document.getElementById('q');
+  let zonaActiva = 'todos';
+
+  function pintar(){
+    const q = qEl.value.toLowerCase();
+    const filtrados = cpcs.filter(c=>{
+      const porTexto = (c.nombre+c.direccion).toLowerCase().includes(q);
+      const porZona = zonaActiva==='todos' || c.zona===zonaActiva;
+      return porTexto && porZona;
+    });
+    grid.innerHTML = filtrados.map(c=>`
+      <div class="card">
+        <h3>${c.nombre}</h3>
+        <small>${c.direccion}</small><br>
+        <small>📍 ${c.zona} • ${c.horario}</small>
+        <div style="margin-top:6px">${c.tramites.slice(0,3).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+        <div class="estado">👥 ${c.estado_vecinos}</div>
+        <a class="btn" href="cpcs.html?id=${c.id}">Ver detalle</a>
+        <a class="btn btn-outline" target="_blank" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.direccion)}">Cómo llego</a>
+      </div>
+    `).join('');
+  }
+  filtrosEl.onclick = e=>{
+    if(!e.target.dataset.z) return;
+    zonaActiva = e.target.dataset.z;
+    document.querySelectorAll('.chip').forEach(ch=>ch.classList.toggle('active', ch.dataset.z===zonaActiva));
+    pintar();
+  };
+  qEl.oninput = pintar;
+  pintar();
+}
+
+function renderDetalle(c){
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <a class="volver" href="cpcs.html">← Volver a todos los CPCs</a>
+    <div class="detalle">
+      <h2 style="margin:0">${c.nombre}</h2>
+      <p style="margin:6px 0;color:#555">${c.direccion} - Zona ${c.zona}</p>
+      <p><b>Horario:</b> ${c.horario} <br><small>${c.horario_detalle||''}</small></p>
+      <p><b>Tel:</b> ${c.telefono}</p>
+      <div>${c.tramites.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+      
+      <div class="estado" style="margin-top:14px">👥 Estado hoy: ${c.estado_vecinos}<br><small>Reporte de vecinos de OnDeVoy</small></div>
+      <div class="report">
+        <button onclick="alert('¡Gracias! Reportaste VACÍO en ${c.nombre}')">🟢 Vacío</button>
+        <button onclick="alert('¡Gracias! Reportaste NORMAL')">🟡 Normal</button>
+        <button onclick="alert('¡Gracias! Reportaste LLENO')">🔴 Lleno</button>
+      </div>
+
+      <a class="btn" style="margin-top:16px" target="_blank" href="${c.link_turno}">Sacar turno en MiDocta →</a>
+      <a class="btn btn-outline" target="_blank" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.direccion)}">Abrir en Maps</a>
+      
+      <p style="font-size:12px;color:#888;margin-top:12px">* OnDeVoy no muestra turnos en tiempo real de la Muni. Te lleva directo a MiDocta oficial y usa reportes de vecinos para estimar la fila.</p>
+    </div>
+  `;
+}
+
+load();
+</script>
+</body>
+</html>
