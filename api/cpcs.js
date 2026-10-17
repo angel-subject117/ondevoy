@@ -160,7 +160,7 @@ export default function handler(req, res) {
     {
       id: "san-vicente",
       nombre: "CPC San Vicente",
-      direccion": "San Jerónimo 2850, B° San Vicente",
+      direccion: "San Jerónimo 2850, B° San Vicente",
       zona: "Sudeste",
       horario: "Lun a Vie 8 a 18hs",
       horario_detalle: "Licencia Digital - 8 a 18hs",
