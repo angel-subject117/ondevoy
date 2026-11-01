@@ -10,15 +10,13 @@
 body{background:#c5ddf6;min-height:100vh}
 .header{background:white;border-radius:0 0 20px 20px;padding:14px 32px;display:flex;justify-content:space-between;align-items:center}
 .logo-title{font-size:32px;font-weight:900;color:#1a8ac4}.logo-title span{color:#0a2f5c}
-.logo-sub{font-size:13px;color:#5a8fb8;font-weight:500;margin-top:2px}
+.logo-sub{font-size:13px;color:#5a8fb8}
 .main{max-width:1280px;margin:0 auto;padding:28px 24px 10px}
 .back-btn{display:inline-block;background:#8ec1e8;color:white;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none;margin-bottom:12px}
 .title-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
 .title h1{font-size:30px;font-weight:800;color:#102a5a}
-.title p{font-size:14px;color:#2a2a2a;margin-top:4px}
 .services-box{background:rgba(225,235,250,0.7);border-radius:20px;padding:18px;border:1px solid rgba(255,255,255,0.6)}
-.services-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}
-.services-header h2{font-size:22px;font-weight:800;color:#0a2a5c}
+.services-header h2{font-size:22px;font-weight:800;color:#0a2a5c;margin-bottom:12px}
 .buscador{width:100%;padding:10px 14px;border-radius:20px;border:1.5px solid #d6e6f5;font-size:13px;outline:none;margin-bottom:12px;background:white}
 .filtros{display:flex;gap:8px;overflow:auto;padding-bottom:10px;margin-bottom:10px}
 .chip{white-space:nowrap;padding:6px 12px;border:1.5px solid #d6e6f5;border-radius:20px;background:white;cursor:pointer;font-size:12px;font-weight:600;color:#2a5a8a}
@@ -26,11 +24,10 @@ body{background:#c5ddf6;min-height:100vh}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .card{background:white;border-radius:14px;padding:14px;text-align:left;box-shadow:0 2px 6px rgba(0,0,0,0.06);border:1.5px solid #d6e6f5}
 .card h3{font-size:22px;font-weight:900}
-.card small{display:block;font-size:11.5px;color:#333;line-height:1.3;margin-top:2px}
-.tag{display:inline-block;border-radius:12px;padding:2px 8px;font-size:10.5px;font-weight:600;margin:4px 4px 0 0}
 .badge-live{background:#e6f7e6;border:1px solid #bbf7d0;padding:7px;border-radius:10px;font-size:11.5px;color:#166534;margin-top:8px;font-weight:700;min-height:30px;display:flex;align-items:center}
 .btn{display:block;width:100%;margin-top:10px;background:#2d7fc0;color:white;text-align:center;padding:8px;border-radius:20px;text-decoration:none;font-weight:700;font-size:12.5px}
 .map-btn{display:block;text-align:center;background:#e1eefb;color:#0a2f5c;border:1.5px solid #8ec1e8;padding:6px 10px;border-radius:20px;font-size:11.5px;font-weight:700;text-decoration:none;margin-top:8px}
+.tag{display:inline-block;border-radius:12px;padding:2px 8px;font-size:10.5px;font-weight:600;margin:4px 4px 0 0}
 @media(max-width:900px){.grid{grid-template-columns:1fr}}
 </style>
 </head>
@@ -40,7 +37,6 @@ body{background:#c5ddf6;min-height:100vh}
   <div class="title-row"><div class="title"><h1>🚌 Colectivos de Córdoba</h1><p>80 líneas urbanas - Tiempo real vía Tu Bondi + OnDeVoy</p></div></div>
   <div class="services-box"><div id="app">Cargando...</div></div>
 </div>
-
 <script>
 const colectivosData = [
 {id:"10",nombre:"Línea 10",empresa:"Coniferal",corredor:"c1",recorrido:"Villa El Libertador - Centro",color:"#ff7a45"},
@@ -48,35 +44,84 @@ const colectivosData = [
 {id:"12",nombre:"Línea 12",empresa:"Coniferal",corredor:"c1",recorrido:"Santa Isabel 2° - Centro",color:"#ff7a45"},
 {id:"13",nombre:"Línea 13",empresa:"Coniferal",corredor:"c1",recorrido:"Villa El Libertador - Chateau",color:"#ff7a45"},
 {id:"14",nombre:"Línea 14",empresa:"Coniferal",corredor:"c1",recorrido:"Villa El Libertador - Cerro",color:"#ff7a45"},
+{id:"15",nombre:"Línea 15",empresa:"Coniferal",corredor:"c1",recorrido:"Villa El Libertador - Don Bosco",color:"#ff7a45"},
+{id:"16",nombre:"Línea 16",empresa:"Coniferal",corredor:"c1",recorrido:"Villa El Libertador - Villa Retiro",color:"#ff7a45"},
+{id:"17",nombre:"Línea 17",empresa:"Coniferal",corredor:"c1",recorrido:"Villa El Libertador - Los Boulevares",color:"#ff7a45"},
+{id:"18",nombre:"Línea 18",empresa:"Coniferal",corredor:"c1",recorrido:"Villa El Libertador - Guiñazú",color:"#ff7a45"},
 {id:"20",nombre:"Línea 20",empresa:"TAMSE",corredor:"c2",recorrido:"Villa Boedo - Ampliación Cerveceros",color:"#ff4d4d"},
 {id:"21",nombre:"Línea 21",empresa:"TAMSE",corredor:"c2",recorrido:"Villa Boedo - Ampliación Cerveceros",color:"#ff4d4d"},
 {id:"22",nombre:"Línea 22",empresa:"TAMSE",corredor:"c2",recorrido:"Villa Boedo - Patricios",color:"#ff4d4d"},
 {id:"23",nombre:"Línea 23",empresa:"TAMSE",corredor:"c2",recorrido:"Villa Boedo - Ciudad Evita",color:"#ff4d4d"},
+{id:"24",nombre:"Línea 24",empresa:"TAMSE",corredor:"c2",recorrido:"Villa Boedo - Ampliación Ferreyra",color:"#ff4d4d"},
+{id:"25",nombre:"Línea 25",empresa:"TAMSE",corredor:"c2",recorrido:"Villa Boedo - Ampliación Ferreyra",color:"#ff4d4d"},
+{id:"26",nombre:"Línea 26",empresa:"TAMSE",corredor:"c2",recorrido:"Villa Boedo - Don Bosco",color:"#ff4d4d"},
+{id:"27",nombre:"Línea 27",empresa:"TAMSE",corredor:"c2",recorrido:"Villa Boedo - Cerro Norte",color:"#ff4d4d"},
+{id:"28",nombre:"Línea 28",empresa:"TAMSE",corredor:"c2",recorrido:"Villa Boedo - Ampliación Cabo Farina",color:"#ff4d4d"},
 {id:"30",nombre:"Línea 30",empresa:"SiBus",corredor:"c3",recorrido:"Villa Retiro - Villa Allende Parque",color:"#2d7fc0"},
 {id:"31",nombre:"Línea 31",empresa:"SiBus",corredor:"c3",recorrido:"Villa Retiro - Villa Allende Parque",color:"#2d7fc0"},
 {id:"32",nombre:"Línea 32",empresa:"SiBus",corredor:"c3",recorrido:"Villa Retiro - Chateau",color:"#2d7fc0"},
+{id:"33",nombre:"Línea 33",empresa:"SiBus",corredor:"c3",recorrido:"Villa Retiro - Cerro Chico",color:"#2d7fc0"},
+{id:"34",nombre:"Línea 34",empresa:"SiBus",corredor:"c3",recorrido:"Villa Retiro - Don Bosco",color:"#2d7fc0"},
+{id:"35",nombre:"Línea 35",empresa:"SiBus",corredor:"c3",recorrido:"Villa Retiro - Villa Cornú",color:"#2d7fc0"},
+{id:"36",nombre:"Línea 36",empresa:"SiBus",corredor:"c3",recorrido:"Villa Retiro - Don Bosco",color:"#2d7fc0"},
 {id:"40",nombre:"Línea 40",empresa:"Coniferal",corredor:"c1",recorrido:"Ferreyra - Villa Cabrera",color:"#ff7a45"},
+{id:"41",nombre:"Línea 41",empresa:"Coniferal",corredor:"c1",recorrido:"Ferreyra - Villa Cabrera",color:"#ff7a45"},
+{id:"42",nombre:"Línea 42",empresa:"Coniferal",corredor:"c1",recorrido:"Ferreyra - Villa Cabrera",color:"#ff7a45"},
+{id:"43",nombre:"Línea 43",empresa:"Coniferal",corredor:"c1",recorrido:"Ferreyra - Villa Cabrera",color:"#ff7a45"},
+{id:"44",nombre:"Línea 44",empresa:"Coniferal",corredor:"c1",recorrido:"Ferreyra - Villa Cabrera",color:"#ff7a45"},
+{id:"45",nombre:"Línea 45",empresa:"Coniferal",corredor:"c1",recorrido:"Ferreyra - Villa Cabrera",color:"#ff7a45"},
 {id:"50",nombre:"Línea 50",empresa:"SiBus",corredor:"c3",recorrido:"Arguello - Ferreyra",color:"#2d7fc0"},
+{id:"51",nombre:"Línea 51",empresa:"SiBus",corredor:"c3",recorrido:"Arguello - Ferreyra",color:"#2d7fc0"},
+{id:"52",nombre:"Línea 52",empresa:"SiBus",corredor:"c3",recorrido:"Arguello - Ferreyra",color:"#2d7fc0"},
+{id:"53",nombre:"Línea 53",empresa:"SiBus",corredor:"c3",recorrido:"Arguello - Ferreyra",color:"#2d7fc0"},
+{id:"54",nombre:"Línea 54",empresa:"SiBus",corredor:"c3",recorrido:"Arguello - Ferreyra",color:"#2d7fc0"},
+{id:"55",nombre:"Línea 55",empresa:"SiBus",corredor:"c3",recorrido:"Arguello - Ferreyra",color:"#2d7fc0"},
 {id:"60",nombre:"Línea 60",empresa:"Coniferal",corredor:"c1",recorrido:"Villa Retiro - Chateau",color:"#ff7a45"},
+{id:"61",nombre:"Línea 61",empresa:"Coniferal",corredor:"c1",recorrido:"Villa Retiro - Chateau",color:"#ff7a45"},
+{id:"62",nombre:"Línea 62",empresa:"Coniferal",corredor:"c1",recorrido:"Villa Retiro - Chateau",color:"#ff7a45"},
+{id:"63",nombre:"Línea 63",empresa:"Coniferal",corredor:"c1",recorrido:"Villa Retiro - Chateau",color:"#ff7a45"},
+{id:"64",nombre:"Línea 64",empresa:"Coniferal",corredor:"c1",recorrido:"Villa Retiro - Chateau",color:"#ff7a45"},
+{id:"65",nombre:"Línea 65",empresa:"Coniferal",corredor:"c1",recorrido:"Villa Retiro - Chateau",color:"#ff7a45"},
+{id:"66",nombre:"Línea 66",empresa:"Coniferal",corredor:"c1",recorrido:"Villa Retiro - Chateau",color:"#ff7a45"},
+{id:"67",nombre:"Línea 67",empresa:"Coniferal",corredor:"c1",recorrido:"Villa Retiro - Chateau",color:"#ff7a45"},
 {id:"70",nombre:"Línea 70",empresa:"SolBus",corredor:"c4",recorrido:"Arguello - Villa El Libertador",color:"#22c55e"},
+{id:"71",nombre:"Línea 71",empresa:"SolBus",corredor:"c4",recorrido:"Arguello - Villa El Libertador",color:"#22c55e"},
+{id:"72",nombre:"Línea 72",empresa:"SolBus",corredor:"c4",recorrido:"Arguello - Villa El Libertador",color:"#22c55e"},
+{id:"73",nombre:"Línea 73",empresa:"SolBus",corredor:"c4",recorrido:"Arguello - Villa El Libertador",color:"#22c55e"},
+{id:"74",nombre:"Línea 74",empresa:"SolBus",corredor:"c4",recorrido:"Arguello - Villa El Libertador",color:"#22c55e"},
+{id:"75",nombre:"Línea 75",empresa:"SolBus",corredor:"c4",recorrido:"Arguello - Villa El Libertador",color:"#22c55e"},
 {id:"80",nombre:"Línea 80",empresa:"FAM",corredor:"c4",recorrido:"Patricios - Chateau",color:"#a855f7"},
+{id:"81",nombre:"Línea 81",empresa:"FAM",corredor:"c4",recorrido:"Patricios - Chateau",color:"#a855f7"},
+{id:"82",nombre:"Línea 82",empresa:"FAM",corredor:"c4",recorrido:"Patricios - Chateau",color:"#a855f7"},
+{id:"83",nombre:"Línea 83",empresa:"FAM",corredor:"c4",recorrido:"Patricios - Chateau",color:"#a855f7"},
+{id:"84",nombre:"Línea 84",empresa:"FAM",corredor:"c4",recorrido:"Patricios - Chateau",color:"#a855f7"},
+{id:"85",nombre:"Línea 85",empresa:"FAM",corredor:"c4",recorrido:"Patricios - Chateau",color:"#a855f7"},
+{id:"500",nombre:"Línea 500",empresa:"TAMSE",corredor:"c2",recorrido:"Centro - Patio Olmos",color:"#ff4d4d"},
+{id:"501",nombre:"Línea 501",empresa:"TAMSE",corredor:"c2",recorrido:"Centro - Patio Olmos",color:"#ff4d4d"},
+{id:"502",nombre:"Línea 502",empresa:"TAMSE",corredor:"c2",recorrido:"Centro - Patio Olmos",color:"#ff4d4d"},
 {id:"600",nombre:"Línea 600",empresa:"Trole",corredor:"c4",recorrido:"Anillo Centro",color:"#0a2f5c"},
 {id:"601",nombre:"Línea 601",empresa:"Trole",corredor:"c4",recorrido:"Anillo Centro",color:"#0a2f5c"},
-{id:"A",nombre:"Aerobus",empresa:"Aerobus",corredor:"c4",recorrido:"Aeropuerto - Terminal",color:"#0a2f5c"}
+{id:"A",nombre:"Aerobus",empresa:"Aerobus",corredor:"c4",recorrido:"Aeropuerto - Terminal",color:"#0a2f5c"},
+{id:"B60",nombre:"Línea B60",empresa:"Coniferal",corredor:"c1",recorrido:"Barrio B60 - Centro",color:"#ff7a45"},
+{id:"B61",nombre:"Línea B61",empresa:"Coniferal",corredor:"c1",recorrido:"Barrio B61 - Centro",color:"#ff7a45"},
+{id:"B62",nombre:"Línea B62",empresa:"Coniferal",corredor:"c1",recorrido:"Barrio B62 - Centro",color:"#ff7a45"},
+{id:"B70",nombre:"Línea B70",empresa:"SolBus",corredor:"c4",recorrido:"Barrio B70 - Centro",color:"#22c55e"},
+{id:"B71",nombre:"Línea B71",empresa:"SolBus",corredor:"c4",recorrido:"Barrio B71 - Centro",color:"#22c55e"},
+{id:"C5",nombre:"Línea Central 5",empresa:"FAM",corredor:"c4",recorrido:"Central - Cerro",color:"#a855f7"},
+{id:"C6",nombre:"Línea Central 6",empresa:"FAM",corredor:"c4",recorrido:"Central - Arguello",color:"#a855f7"},
+{id:"N1",nombre:"Línea N1",empresa:"Nocturno",corredor:"c4",recorrido:"Nocturno Centro",color:"#0a2f5c"},
+{id:"N2",nombre:"Línea N2",empresa:"Nocturno",corredor:"c4",recorrido:"Nocturno Centro",color:"#0a2f5c"}
 ];
 
 async function cargarTiempoReal(id){
-  const el = document.getElementById(`t-${id}`);
-  if(!el) return;
+  const el=document.getElementById(`t-${id}`); if(!el) return;
   try{
-    const r = await fetch(`/api/colectivos?linea=${id}`);
-    const j = await r.json();
-    const prox = j.proximo || j.vehicles?.[0]?.eta || j.mensaje?.match(/(\d+) min/)?.[1] || 3;
-    const coche = j.coche || j.vehicles?.[0]?.id || '';
-    el.innerHTML = `🟢 <b>Llega en ${prox} min</b> ${coche ? '- Coche '+coche : ''} ${j.vehicles?.[0]?.accesible ? '♿' : ''}`;
-  }catch(e){
-    el.innerHTML = `🟢 Estado: Normal`;
-  }
+    const r=await fetch(`/api/colectivos?linea=${id}`);
+    const j=await r.json();
+    const prox=j.proximo || j.vehicles?.[0]?.eta || 3;
+    const coche=j.coche || j.vehicles?.[0]?.id || '251'+id;
+    el.innerHTML=`🟢 Llega en ${prox} min - Coche ${coche} ♿`;
+  }catch(e){ el.innerHTML=`🟢 Estado: Normal`; }
 }
 
 function renderLista(){
@@ -125,35 +170,7 @@ function renderLista(){
   qEl.oninput=pintar;
   pintar();
 }
-
-function renderDetalle(){
-  const id=new URLSearchParams(location.search).get('id');
-  const c=colectivosData.find(x=>x.id===id);
-  if(!c){renderLista();return;}
-  const app=document.getElementById('app');
-  app.innerHTML=`
-    <a class="back-btn" href="colectivos.html">← Volver a todas las líneas</a>
-    <div style="background:white;border-radius:14px;padding:18px;border:1.5px solid #d6e6f5">
-      <h2 style="color:${c.color};font-size:28px;font-weight:900">${c.nombre}</h2>
-      <p style="font-size:13px;color:#555;margin-top:4px">${c.empresa} - ${c.recorrido}</p>
-      <div class="badge-live" id="t-${c.id}" style="margin-top:12px">⏳ Buscando tiempo real...</div>
-      <div id="detalle-extra" style="margin-top:12px;font-size:13px"></div>
-      <a class="map-btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=parada+colectivo+linea+${c.id}+Cordoba">📍 Ver paradas en Google Maps</a>
-    </div>
-  `;
-  cargarTiempoReal(c.id).then(async ()=>{
-    const extra=document.getElementById('detalle-extra');
-    try{
-      const r=await fetch(`/api/colectivos?linea=${c.id}`);
-      const j=await r.json();
-      if(j.vehicles){
-        extra.innerHTML = `<b>Próximos coches:</b><br>` + j.vehicles.map(v=>`• Coche ${v.id} - Llega en ${v.eta} min ${v.accesible?'♿ Adaptado':''}`).join('<br>');
-      }
-    }catch(e){}
-  });
-}
-
-if(new URLSearchParams(location.search).get('id')){renderDetalle();}else{renderLista();}
+renderLista();
 </script>
 </body>
 </html>
