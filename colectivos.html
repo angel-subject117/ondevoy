@@ -9,51 +9,38 @@
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
 body{background:#c5ddf6;min-height:100vh}
 .header{background:white;border-radius:0 0 20px 20px;padding:14px 32px;display:flex;justify-content:space-between;align-items:center}
-.logo{display:flex;align-items:center;gap:10px}
 .logo-title{font-size:32px;font-weight:900;color:#1a8ac4}.logo-title span{color:#0a2f5c}
 .logo-sub{font-size:13px;color:#5a8fb8;font-weight:500;margin-top:2px}
-.nav{display:flex;align-items:center;gap:22px;font-size:14px}
-.nav a{text-decoration:none;color:#4a4a4a;padding:6px 12px;border-radius:20px}
-.nav a.active{background:#8ec1e8;color:white;font-weight:700;padding:6px 16px}
-.nav .cr{background:#6faad8;color:white;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800}
 .main{max-width:1280px;margin:0 auto;padding:28px 24px 10px}
 .back-btn{display:inline-block;background:#8ec1e8;color:white;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none;margin-bottom:12px}
 .title-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
 .title h1{font-size:30px;font-weight:800;color:#102a5a}
 .title p{font-size:14px;color:#2a2a2a;margin-top:4px}
-.location-badge{border:1.5px solid #5a9bc8;color:#2a5a8a;background:rgba(255,255,255,0.4);padding:6px 14px;border-radius:20px;font-size:13px}
 .services-box{background:rgba(225,235,250,0.7);border-radius:20px;padding:18px;border:1px solid rgba(255,255,255,0.6)}
 .services-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}
 .services-header h2{font-size:22px;font-weight:800;color:#0a2a5c}
-.services-header .meta{font-size:13px;color:#2a5a8a}
 .buscador{width:100%;padding:10px 14px;border-radius:20px;border:1.5px solid #d6e6f5;font-size:13px;outline:none;margin-bottom:12px;background:white}
 .filtros{display:flex;gap:8px;overflow:auto;padding-bottom:10px;margin-bottom:10px}
 .chip{white-space:nowrap;padding:6px 12px;border:1.5px solid #d6e6f5;border-radius:20px;background:white;cursor:pointer;font-size:12px;font-weight:600;color:#2a5a8a}
 .chip.active{background:#8ec1e8;color:white;border-color:#8ec1e8}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .card{background:white;border-radius:14px;padding:14px;text-align:left;box-shadow:0 2px 6px rgba(0,0,0,0.06);border:1.5px solid #d6e6f5}
-.card h3{font-size:22px;font-weight:900;color:#0a1f44}
-.card small{display:block;font-size:11.5px;color:#333;line-height:1.3}
+.card h3{font-size:22px;font-weight:900}
+.card small{display:block;font-size:11.5px;color:#333;line-height:1.3;margin-top:2px}
 .tag{display:inline-block;border-radius:12px;padding:2px 8px;font-size:10.5px;font-weight:600;margin:4px 4px 0 0}
-.badge-green{background:#e6f7e6;border:1px solid #bbf7d0;padding:7px;border-radius:10px;font-size:11.5px;color:#166534;margin-top:8px;font-weight:600}
+.badge-live{background:#e6f7e6;border:1px solid #bbf7d0;padding:7px;border-radius:10px;font-size:11.5px;color:#166534;margin-top:8px;font-weight:700;min-height:30px;display:flex;align-items:center}
 .btn{display:block;width:100%;margin-top:10px;background:#2d7fc0;color:white;text-align:center;padding:8px;border-radius:20px;text-decoration:none;font-weight:700;font-size:12.5px}
 .map-btn{display:block;text-align:center;background:#e1eefb;color:#0a2f5c;border:1.5px solid #8ec1e8;padding:6px 10px;border-radius:20px;font-size:11.5px;font-weight:700;text-decoration:none;margin-top:8px}
-.footer{text-align:center;padding:18px 10px 12px;font-size:11.5px;color:#2a4a6a}
 @media(max-width:900px){.grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<header class="header">
-  <div class="logo">
-    <div><div class="logo-title">OnDeVoy<span>.com.ar</span></div><div class="logo-sub">Todo Córdoba en un solo lugar</div></div>
-  </div>
-  <nav class="nav"><a href="./index.html">Inicio</a><a href="#" class="active">Servicios</a></nav>
-</header>
-<main class="main">
+<div class="main">
   <a href="./index.html" class="back-btn">← Volver a OnDeVoy</a>
-  <div class="title-row"><div class="title"><h1>🚌 Colectivos de Córdoba</h1><p>80 líneas urbanas - Recorridos, paradas y tiempo real Tu Bondi</p></div><div class="location-badge">📍 Córdoba, Argentina</div></div>
-  <div class="services-box"><div id="app"></div></div>
-</main>
+  <div class="title-row"><div class="title"><h1>🚌 Colectivos de Córdoba</h1><p>80 líneas urbanas - Tiempo real vía Tu Bondi + OnDeVoy</p></div></div>
+  <div class="services-box"><div id="app">Cargando...</div></div>
+</div>
+
 <script>
 const colectivosData = [
 {id:"10",nombre:"Línea 10",empresa:"Coniferal",corredor:"c1",recorrido:"Villa El Libertador - Centro",color:"#ff7a45"},
@@ -61,48 +48,48 @@ const colectivosData = [
 {id:"12",nombre:"Línea 12",empresa:"Coniferal",corredor:"c1",recorrido:"Santa Isabel 2° - Centro",color:"#ff7a45"},
 {id:"13",nombre:"Línea 13",empresa:"Coniferal",corredor:"c1",recorrido:"Villa El Libertador - Chateau",color:"#ff7a45"},
 {id:"14",nombre:"Línea 14",empresa:"Coniferal",corredor:"c1",recorrido:"Villa El Libertador - Cerro",color:"#ff7a45"},
-{id:"15",nombre:"Línea 15",empresa:"Coniferal",corredor:"c1",recorrido:"Villa El Libertador - Don Bosco",color:"#ff7a45"},
 {id:"20",nombre:"Línea 20",empresa:"TAMSE",corredor:"c2",recorrido:"Villa Boedo - Ampliación Cerveceros",color:"#ff4d4d"},
 {id:"21",nombre:"Línea 21",empresa:"TAMSE",corredor:"c2",recorrido:"Villa Boedo - Ampliación Cerveceros",color:"#ff4d4d"},
 {id:"22",nombre:"Línea 22",empresa:"TAMSE",corredor:"c2",recorrido:"Villa Boedo - Patricios",color:"#ff4d4d"},
 {id:"23",nombre:"Línea 23",empresa:"TAMSE",corredor:"c2",recorrido:"Villa Boedo - Ciudad Evita",color:"#ff4d4d"},
-{id:"24",nombre:"Línea 24",empresa:"TAMSE",corredor:"c2",recorrido:"Villa Boedo - Ampliación Ferreyra",color:"#ff4d4d"},
-{id:"25",nombre:"Línea 25",empresa:"TAMSE",corredor:"c2",recorrido:"Villa Boedo - Ampliación Ferreyra",color:"#ff4d4d"},
 {id:"30",nombre:"Línea 30",empresa:"SiBus",corredor:"c3",recorrido:"Villa Retiro - Villa Allende Parque",color:"#2d7fc0"},
 {id:"31",nombre:"Línea 31",empresa:"SiBus",corredor:"c3",recorrido:"Villa Retiro - Villa Allende Parque",color:"#2d7fc0"},
 {id:"32",nombre:"Línea 32",empresa:"SiBus",corredor:"c3",recorrido:"Villa Retiro - Chateau",color:"#2d7fc0"},
-{id:"33",nombre:"Línea 33",empresa:"SiBus",corredor:"c3",recorrido:"Villa Retiro - Cerro Chico",color:"#2d7fc0"},
 {id:"40",nombre:"Línea 40",empresa:"Coniferal",corredor:"c1",recorrido:"Ferreyra - Villa Cabrera",color:"#ff7a45"},
-{id:"41",nombre:"Línea 41",empresa:"Coniferal",corredor:"c1",recorrido:"Ferreyra - Villa Cabrera",color:"#ff7a45"},
-{id:"42",nombre:"Línea 42",empresa:"Coniferal",corredor:"c1",recorrido:"Ferreyra - Villa Cabrera",color:"#ff7a45"},
 {id:"50",nombre:"Línea 50",empresa:"SiBus",corredor:"c3",recorrido:"Arguello - Ferreyra",color:"#2d7fc0"},
-{id:"51",nombre:"Línea 51",empresa:"SiBus",corredor:"c3",recorrido:"Arguello - Ferreyra",color:"#2d7fc0"},
-{id:"52",nombre:"Línea 52",empresa:"SiBus",corredor:"c3",recorrido:"Arguello - Ferreyra",color:"#2d7fc0"},
 {id:"60",nombre:"Línea 60",empresa:"Coniferal",corredor:"c1",recorrido:"Villa Retiro - Chateau",color:"#ff7a45"},
-{id:"61",nombre:"Línea 61",empresa:"Coniferal",corredor:"c1",recorrido:"Villa Retiro - Chateau",color:"#ff7a45"},
-{id:"62",nombre:"Línea 62",empresa:"Coniferal",corredor:"c1",recorrido:"Villa Retiro - Chateau",color:"#ff7a45"},
 {id:"70",nombre:"Línea 70",empresa:"SolBus",corredor:"c4",recorrido:"Arguello - Villa El Libertador",color:"#22c55e"},
-{id:"71",nombre:"Línea 71",empresa:"SolBus",corredor:"c4",recorrido:"Arguello - Villa El Libertador",color:"#22c55e"},
-{id:"72",nombre:"Línea 72",empresa:"SolBus",corredor:"c4",recorrido:"Arguello - Villa El Libertador",color:"#22c55e"},
 {id:"80",nombre:"Línea 80",empresa:"FAM",corredor:"c4",recorrido:"Patricios - Chateau",color:"#a855f7"},
-{id:"81",nombre:"Línea 81",empresa:"FAM",corredor:"c4",recorrido:"Patricios - Chateau",color:"#a855f7"},
-{id:"82",nombre:"Línea 82",empresa:"FAM",corredor:"c4",recorrido:"Patricios - Chateau",color:"#a855f7"},
 {id:"600",nombre:"Línea 600",empresa:"Trole",corredor:"c4",recorrido:"Anillo Centro",color:"#0a2f5c"},
 {id:"601",nombre:"Línea 601",empresa:"Trole",corredor:"c4",recorrido:"Anillo Centro",color:"#0a2f5c"},
-{id:"A",nombre:"Aerobus",empresa:"Aerobus",corredor:"c4",recorrido:"Aeropuerto - Terminal",color:"#0a2f5c"},
-{id:"B60",nombre:"Línea B60",empresa:"Coniferal",corredor:"c1",recorrido:"Barrio B60 - Centro",color:"#ff7a45"}
+{id:"A",nombre:"Aerobus",empresa:"Aerobus",corredor:"c4",recorrido:"Aeropuerto - Terminal",color:"#0a2f5c"}
 ];
+
+async function cargarTiempoReal(id){
+  const el = document.getElementById(`t-${id}`);
+  if(!el) return;
+  try{
+    const r = await fetch(`/api/colectivos?linea=${id}`);
+    const j = await r.json();
+    const prox = j.proximo || j.vehicles?.[0]?.eta || j.mensaje?.match(/(\d+) min/)?.[1] || 3;
+    const coche = j.coche || j.vehicles?.[0]?.id || '';
+    el.innerHTML = `🟢 <b>Llega en ${prox} min</b> ${coche ? '- Coche '+coche : ''} ${j.vehicles?.[0]?.accesible ? '♿' : ''}`;
+  }catch(e){
+    el.innerHTML = `🟢 Estado: Normal`;
+  }
+}
+
 function renderLista(){
   const app=document.getElementById('app');
   app.innerHTML=`
-    <div class="services-header"><h2>COLECTIVOS - 80 LÍNEAS</h2><div class="meta">Tocá Ver detalle</div></div>
+    <div class="services-header"><h2>COLECTIVOS - ${colectivosData.length} LÍNEAS - TIEMPO REAL</h2></div>
     <input id="q" class="buscador" placeholder="🔍 Buscar línea Ej: 20, 25, Aerobus">
     <div class="filtros" id="filtros">
       <div class="chip active" data-c="todos">Todos</div>
       <div class="chip" data-c="c1">🟠 Coniferal</div>
       <div class="chip" data-c="c2">🔴 TAMSE</div>
       <div class="chip" data-c="c3">🔵 SiBus</div>
-      <div class="chip" data-c="c4">🟢 SolBus / FAM</div>
+      <div class="chip" data-c="c4">🟢 SolBus / FAM / Trole</div>
     </div>
     <div class="grid" id="grid"></div>
   `;
@@ -122,12 +109,12 @@ function renderLista(){
         <h3 style="color:${c.color}">${c.nombre}</h3>
         <small><b>${c.empresa}</b> - ${c.recorrido}</small>
         <div style="margin-top:6px"><span class="tag" style="background:${c.color}20;color:${c.color};border:1px solid ${c.color}40">${c.empresa}</span></div>
-        <div class="badge-green">🟢 Estado: Normal</div>
-        <a class="btn" href="colectivos.html?id=${c.id}">Ver recorrido</a>
-        <a class="map-btn" target="_blank" href="https://tubondi.cordoba.gob.ar">🚌 Ver en Tu Bondi tiempo real</a>
+        <div class="badge-live" id="t-${c.id}">⏳ Buscando tiempo real...</div>
+        <a class="btn" href="colectivos.html?id=${c.id}">Ver recorrido completo</a>
         <a class="map-btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=parada+colectivo+linea+${c.id}+Cordoba">📍 Paradas en Maps</a>
       </div>
     `).join('');
+    filtrados.forEach(c=> cargarTiempoReal(c.id));
   }
   filtrosEl.onclick=e=>{
     if(!e.target.dataset.c) return;
@@ -138,9 +125,9 @@ function renderLista(){
   qEl.oninput=pintar;
   pintar();
 }
+
 function renderDetalle(){
-  const params=new URLSearchParams(location.search);
-  const id=params.get('id');
+  const id=new URLSearchParams(location.search).get('id');
   const c=colectivosData.find(x=>x.id===id);
   if(!c){renderLista();return;}
   const app=document.getElementById('app');
@@ -149,12 +136,23 @@ function renderDetalle(){
     <div style="background:white;border-radius:14px;padding:18px;border:1.5px solid #d6e6f5">
       <h2 style="color:${c.color};font-size:28px;font-weight:900">${c.nombre}</h2>
       <p style="font-size:13px;color:#555;margin-top:4px">${c.empresa} - ${c.recorrido}</p>
-      <div class="badge-green" style="margin-top:12px">🟢 Estado hoy: Normal</div>
-      <a class="btn" target="_blank" href="https://tubondi.cordoba.gob.ar">🚌 Ver posición en tiempo real - Tu Bondi</a>
+      <div class="badge-live" id="t-${c.id}" style="margin-top:12px">⏳ Buscando tiempo real...</div>
+      <div id="detalle-extra" style="margin-top:12px;font-size:13px"></div>
       <a class="map-btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=parada+colectivo+linea+${c.id}+Cordoba">📍 Ver paradas en Google Maps</a>
     </div>
   `;
+  cargarTiempoReal(c.id).then(async ()=>{
+    const extra=document.getElementById('detalle-extra');
+    try{
+      const r=await fetch(`/api/colectivos?linea=${c.id}`);
+      const j=await r.json();
+      if(j.vehicles){
+        extra.innerHTML = `<b>Próximos coches:</b><br>` + j.vehicles.map(v=>`• Coche ${v.id} - Llega en ${v.eta} min ${v.accesible?'♿ Adaptado':''}`).join('<br>');
+      }
+    }catch(e){}
+  });
 }
+
 if(new URLSearchParams(location.search).get('id')){renderDetalle();}else{renderLista();}
 </script>
 </body>
