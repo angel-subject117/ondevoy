@@ -1,1 +1,18 @@
+name: Actualizar Colectivos - OnDeVoy
 
+on:
+  schedule:
+    - cron: '*/2 * * * *'  # Cada 2 minutos
+  workflow_dispatch:  # Para probarlo a mano
+
+jobs:
+  ping-colectivos:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping API Colectivos
+        run: |
+          echo "Actualizando colectivos..."
+          curl -s "https://TU-DOMINIO.vercel.app/api/colectivos?linea=20" > /dev/null
+          curl -s "https://TU-DOMINIO.vercel.app/api/colectivos?linea=30" > /dev/null
+          curl -s "https://TU-DOMINIO.vercel.app/api/colectivos?linea=60" > /dev/null
+          echo "Listo!"
