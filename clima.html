@@ -1,1 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clima Córdoba en Tiempo Real - OnDeVoy.com.ar</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
+body{background:#c5ddf6;min-height:100vh}
+.header{background:white;border-radius:0 0 20px 20px;padding:14px 32px;display:flex;justify-content:space-between;align-items:center}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-title{font-size:28px;font-weight:900;color:#1a8ac4}.logo-title span{color:#0a2f5c}
+.btn-volver{background:#0a1f44;color:white;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none}
+.main{max-width:900px;margin:0 auto;padding:24px}
+.card-grande{background:white;border-radius:18px;padding:22px;border:1.5px solid #d6e6f5;box-shadow:0 4px 12px rgba(0,0,0,0.06);margin-bottom:16px}
+.temp-grande{font-size:64px;font-weight:900;color:#0a1f44;line-height:1}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.mini-card{background:#f1f8ff;border-radius:12px;padding:12px;text-align:center;border:1px solid #d6e6f5}
+.mini-card b{font-size:22px;display:block;color:#0a1f44}
+.mini-card span{font-size:11.5px;color:#555}
+.horas{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;margin-top:12px}
+.hora-item{background:#f1f8ff;border-radius:12px;padding:10px 14px;min-width:70px;text-align:center;border:1px solid #d6e6f5}
+.footer{text-align:center;padding:18px;font-size:11.5px;color:#2a4a6a}
+.footer a{color:#2a4a6a;text-decoration:none}
+@media(max-width:700px){.grid3{grid-template-columns:1fr} .temp-grande{font-size:48px}}
+</style>
+</head>
+<body>
+<header class="header">
+  <a href="./index.html" class="logo">
+    <div class="logo-title">OnDeVoy<span>.com.ar</span></div>
+  </a>
+  <a href="./index.html" class="btn-volver">← Volver al inicio</a>
+</header>
 
+<main class="main">
+  <div class="card-grande" id="clima-main">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+      <div>
+        <div style="font-size:14px;color:#5a8fb8;font-weight:700">📍 Córdoba Capital - Tiempo real</div>
+        <div style="display:flex;align-items:center;gap:14px;margin-top:8px">
+          <div class="temp-grande" id="c-temp">--°C</div>
+          <div style="font-size:48px" id="c-icono">☁️</div>
+        </div>
+        <div style="font-size:16px;font-weight:700;color:#0a1f44;margin-top:4px" id="c-estado">Cargando...</div>
+        <div style="font-size:12.5px;color:#555;margin-top:2px" id="c-detalle">Sensación térmica --°C</div>
+      </div>
+      <div class="grid3" style="min-width:280px">
+        <div class="mini-card"><b id="c-max">--°</b><span>Max hoy</span></div>
+        <div class="mini-card"><b id="c-min">--°</b><span>Min hoy</span></div>
+        <div class="mini-card"><b id="c-hum">--%</b><span>Humedad</span></div>
+        <div class="mini-card"><b id="c-viento">--</b><span>Viento km/h</span></div>
+        <div class="mini-card"><b id="c-lluvia">--%</b><span>Prob lluvia</span></div>
+        <div class="mini-card"><b id="c-st">--°</b><span>Sensación</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-grande">
+    <h3 style="font-size:16px;font-weight:800;color:#0a1f44">Pronóstico por hora - Hoy</h3>
+    <div class="horas" id="c-horas">Cargando horas...</div>
+  </div>
+
+  <div class="card-grande">
+    <h3 style="font-size:16px;font-weight:800;color:#0a1f44">Próximos 3 días</h3>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px" id="c-dias"></div>
+  </div>
+
+  <div class="card-grande" style="background:#eaf4ff">
+    <div style="font-size:12px;color:#2a5a8a;line-height:1.5">
+      <b>Fuente:</b> Open-Meteo (datos del Servicio Meteorológico Nacional) • Actualización automática cada 5 min • OnDeVoy.com.ar<br>
+      Coordenadas: -31.42, -64.18 - Córdoba, Argentina
+    </div>
+  </div>
+</main>
+
+<footer class="footer"><strong>OnDeVoy.com.ar</strong> • <a href="./privacidad.html">Privacidad</a> • <a href="./terminos.html">Términos</a> • <a href="./mapa.html">Mapa del sitio</a></footer>
+
+<script>
+async function cargarClimaFull(){
+  try{
+    const r = await fetch('/api/clima');
+    const j = await r.json();
+    if(!j.ok) throw new Error('no ok');
+    const c = j.actual;
+    
+    let icono = '☀️';
+    if(c.estado.includes('Nublado')) icono = '☁️';
+    if(c.estado.includes('Parcial')) icono = '⛅';
+    if(c.estado.includes('Lluvia') || c.estado.includes('Llovizna') || c.estado.includes('Chubasco')) icono = '🌧️';
+    if(c.estado.includes('Tormenta')) icono = '⛈️';
+    if(c.estado.includes('Niebla')) icono = '🌫️';
+
+    document.getElementById('c-temp').textContent = c.temp + '°C';
+    document.getElementById('c-icono').textContent = icono;
+    document.getElementById('c-estado').textContent = c.estado;
+    document.getElementById('c-detalle').textContent = `Sensación térmica ${c.sensacion}°C • ${c.humedad}% humedad • Viento ${c.viento} km/h`;
+    document.getElementById('c-max').textContent = j.hoy.max + '°';
+    document.getElementById('c-min').textContent = j.hoy.min + '°';
+    document.getElementById('c-hum').textContent = c.humedad + '%';
+    document.getElementById('c-viento').textContent = c.viento;
+    document.getElementById('c-lluvia').textContent = j.hoy.probLluvia + '%';
+    document.getElementById('c-st').textContent = c.sensacion + '°';
+
+    // Horas - próximas 12hs
+    const horasDiv = document.getElementById('c-horas');
+    horasDiv.innerHTML = '';
+    if(j.raw && j.raw.hourly){
+      for(let i=0;i<12;i++){
+        const temp = Math.round(j.raw.hourly.temperature_2m[i]);
+        const hora = new Date(j.raw.hourly.time[i]).getHours();
+        horasDiv.innerHTML += `<div class="hora-item"><div style="font-size:11px;color:#666">${hora}:00</div><div style="font-size:16px;font-weight:800;margin:4px 0">${temp}°</div><div style="font-size:12px">🌤️</div></div>`;
+      }
+    }
+
+    // 3 días
+    const diasDiv = document.getElementById('c-dias');
+    diasDiv.innerHTML = `
+      <div class="mini-card"><b>Hoy</b><span style="font-size:14px;font-weight:800;color:#0a1f44;display:block;margin-top:4px">${j.hoy.max}° / ${j.hoy.min}°</span><span>${j.hoy.probLluvia}% lluvia</span></div>
+      <div class="mini-card"><b>Mañana</b><span style="font-size:14px;font-weight:800;color:#0a1f44;display:block;margin-top:4px">${j.manana.max}° / ${j.manana.min}°</span><span>${j.manana.probLluvia}% lluvia</span></div>
+      <div class="mini-card"><b>Pasado</b><span style="font-size:14px;font-weight:800;color:#0a1f44;display:block;margin-top:4px">${Math.round(j.raw.daily.temperature_2m_max[2])}° / ${Math.round(j.raw.daily.temperature_2m_min[2])}°</span><span>${j.raw.daily.precipitation_probability_max[2]}% lluvia</span></div>
+    `;
+
+  }catch(e){
+    document.getElementById('c-estado').textContent = 'Error cargando clima, reintentando...';
+  }
+}
+cargarClimaFull();
+setInterval(cargarClimaFull, 300000);
+</script>
+</body>
+</html>
