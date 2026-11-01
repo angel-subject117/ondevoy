@@ -3,39 +3,68 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cortes de Agua - OnDeVoy Córdoba</title>
+<title>Aguas Cordobesas - OnDeVoy.com.ar</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-body{font-family:system-ui,sans-serif;background:#f5f7fb;margin:0;padding:20px}
-.container{max-width:1000px;margin:auto;background:white;border-radius:16px;padding:20px;box-shadow:0 4px 20px rgba(0,0,0,.08)}
-.header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
-.btn-volver{background:#0f172a;color:white;padding:10px 16px;border-radius:10px;text-decoration:none;font-size:14px;font-weight:600}
-.badge{background:#e3f2fd;color:#1565c0;padding:4px 10px;border-radius:20px;font-size:12px}
-.filtros{margin-top:18px;display:flex;gap:12px;flex-wrap:wrap}
-.filtros input,.filtros select{padding:10px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px;flex:1;min-width:200px}
-table{width:100%;border-collapse:collapse;margin-top:16px}
-th{background:#f0f4ff;text-align:left;padding:10px;font-size:13px}
-td{padding:10px;border-bottom:1px solid #eee;font-size:13px}
-.loader{text-align:center;padding:40px}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
+body{background:#c5ddf6;min-height:100vh}
+.header{background:white;border-radius:0 0 20px 20px;padding:14px 32px;display:flex;justify-content:space-between;align-items:center}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-title{font-size:32px;font-weight:900;color:#1a8ac4}.logo-title span{color:#0a2f5c}
+.logo-sub{font-size:13px;color:#5a8fb8;font-weight:500;margin-top:2px}
+.nav{display:flex;align-items:center;gap:22px;font-size:14px}
+.nav a{text-decoration:none;color:#4a4a4a;padding:6px 12px;border-radius:20px}
+.nav a.active{background:#8ec1e8;color:white;font-weight:700;padding:6px 16px}
+.nav .cr{background:#6faad8;color:white;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800}
+.main{max-width:1280px;margin:0 auto;padding:28px 24px 10px}
+.back-btn{display:inline-block;background:#8ec1e8;color:white;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none;margin-bottom:12px}
+.title-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
+.title h1{font-size:30px;font-weight:800;color:#102a5a}
+.title p{font-size:14px;color:#2a2a2a;margin-top:4px}
+.location-badge{border:1.5px solid #5a9bc8;color:#2a5a8a;background:rgba(255,255,255,0.4);padding:6px 14px;border-radius:20px;font-size:13px}
+.services-box{background:rgba(225,235,250,0.7);border-radius:20px;padding:18px;border:1px solid rgba(255,255,255,0.6)}
+.services-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.services-header h2{font-size:22px;font-weight:800;color:#0a2a5c}
+.services-header .meta{font-size:13px;color:#2a5a8a}
+.filtros{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.filtros input,.filtros select{padding:10px 14px;border-radius:20px;border:1.5px solid #d6e6f5;min-width:220px;font-size:13px;outline:none;background:white}
+.filtros input:focus,.filtros select:focus{border-color:#8ec1e8}
+.grid-cortes{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.card{background:white;border-radius:14px;padding:14px;text-align:left;box-shadow:0 2px 6px rgba(0,0,0,0.06);border:1.5px solid #d6e6f5;border-left:4px solid #2d7fc0;transition:0.15s}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,0.12)}
+.badge{display:inline-flex;padding:4px 10px;border-radius:14px;font-size:11px;font-weight:700;color:white;margin-bottom:6px}
+.badge-orange{background:#e5a02b}.badge-blue{background:#2d7fc0}.badge-green{background:#6ab04c}
+.card .zona{font-size:13px;font-weight:700;color:#0a1f44;margin:6px 0;line-height:1.3}
+.card .motivo{font-size:11.5px;color:#333;line-height:1.35}
+.footer{text-align:center;padding:18px 10px 12px;font-size:11.5px;color:#2a4a6a}
+@media(max-width:900px){.grid-cortes{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<div class="container">
-<div class="header">
-<h1 style="margin:0">💧 Cortes de Agua <span class="badge" id="count">Cargando...</span></h1>
-<a href="/" class="btn-volver">⬅ Volver a OnDeVoy</a>
-</div>
-<p style="color:#666;font-size:14px">Datos oficiales ArcGIS Aguas Cordobesas</p>
-<div class="filtros">
-<input type="text" id="filtroBarrio" placeholder="🔍 Filtrar por barrio Ej: Alberdi, Centro...">
-<select id="filtroEstado"><option value="">Todos los estados</option><option value="En Espera">En Espera</option><option value="Finalizado">Finalizado</option><option value="Programado">Programado</option></select>
-</div>
-<div id="loader" class="loader">Buscando cortes...</div>
-<table id="tabla" style="display:none">
-<thead><tr><th>N°</th><th>Barrios / Dirección</th><th>Inicio</th><th>Fin</th><th>Estado</th><th>Motivo</th></tr></thead>
-<tbody id="tbody"></tbody>
-</table>
-<div id="sinResultados" style="display:none;text-align:center;padding:30px;color:#666">No hay resultados para ese filtro 😕</div>
-</div>
+<header class="header">
+  <div class="logo">
+    <svg viewBox="0 0 48 60" width="52" height="52"><path d="M24 0 C10 0 0 10 0 22 C0 38 24 60 24 60 C24 60 48 38 48 22 C48 10 38 0 24 0 Z" fill="#d6ecff" stroke="#3a8ac0" stroke-width="2.5"/><circle cx="24" cy="20" r="11" fill="white" stroke="#3a8ac0" stroke-width="2.2"/></svg>
+    <div><div class="logo-title">OnDeVoy<span>.com.ar</span></div><div class="logo-sub">Todo Córdoba en un solo lugar</div></div>
+  </div>
+  <nav class="nav"><a href="./index.html">Inicio</a><a href="#" class="active">Servicios</a><a href="#">🔔 Alertas</a><a href="#">Ayuda</a><div class="cr">CR</div></nav>
+</header>
+<main class="main">
+  <a href="./index.html" class="back-btn">← Volver a OnDeVoy</a>
+  <div class="title-row"><div class="title"><h1>💧 Aguas Cordobesas - Cortes</h1><p>Datos oficiales ArcGIS Aguas Cordobesas • <span id="count">Cargando...</span></p></div><div class="location-badge">📍 Córdoba, Argentina</div></div>
+
+  <div class="services-box">
+    <div class="services-header"><h2>Filtros</h2><div class="meta">Filtrá por barrio o estado del corte</div></div>
+    <div class="filtros">
+      <input type="text" id="filtroBarrio" placeholder="🔍 Barrio Ej: Alberdi, Centro...">
+      <select id="filtroEstado"><option value="">Todos los estados</option><option value="En Espera">En Espera</option><option value="Finalizado">Finalizado</option><option value="Programado">Programado</option></select>
+    </div>
+    <div id="loader" style="text-align:center;padding:20px;color:#2a5a8a">Buscando cortes oficiales...</div>
+    <div id="lista" class="grid-cortes"></div>
+    <div id="sinResultados" style="display:none;text-align:center;padding:30px;color:#666">No hay resultados para ese filtro 😕</div>
+  </div>
+</main>
+<footer class="footer"><strong>OnDeVoy.com.ar</strong> • Datos oficiales Aguas Cordobesas</footer>
+
 <script>
 const API = "/api/aguas";
 let todosLosCortes = [];
@@ -46,17 +75,30 @@ async function cargar(){
   document.getElementById("loader").style.display="none";
   render(todosLosCortes);
 }
+function getBadgeColor(estado){
+  const e = (estado||'').toLowerCase();
+  if(e.includes('espera')) return 'badge-orange';
+  if(e.includes('programado')) return 'badge-blue';
+  if(e.includes('finalizado')) return 'badge-green';
+  return 'badge-blue';
+}
 function render(lista){
-  const tbody = document.getElementById("tbody");
-  tbody.innerHTML = "";
-  document.getElementById("tabla").style.display = lista.length ? "table" : "none";
+  const cont = document.getElementById("lista");
+  cont.innerHTML = "";
   document.getElementById("sinResultados").style.display = lista.length ? "none" : "block";
   document.getElementById("count").textContent = lista.length + " cortes";
   lista.forEach(f=>{
     const a = f.attributes;
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td><b>${a.Numero||"-"}</b></td><td>${a.Barrios_Afectados||a.Direccion||"-"}</td><td>${a.Fecha_Inicio_Prevista ? new Date(a.Fecha_Inicio_Prevista).toLocaleString("es-AR") : "-"}</td><td>${a.Fecha_Fin_Prevista ? new Date(a.Fecha_Fin_Prevista).toLocaleString("es-AR") : "-"}</td><td>${a.Estado_Corte||"-"}</td><td>${a.causante||"-"}</td>`;
-    tbody.appendChild(tr);
+    const inicio = a.Fecha_Inicio_Prevista ? new Date(a.Fecha_Inicio_Prevista).toLocaleString("es-AR") : "-";
+    const fin = a.Fecha_Fin_Prevista ? new Date(a.Fecha_Fin_Prevista).toLocaleString("es-AR") : "-";
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `
+      <div><span class="badge ${getBadgeColor(a.Estado_Corte)}">${a.Estado_Corte||"-"}</span> <b style="font-size:12px;color:#0a2f5c">N° ${a.Numero||"-"}</b></div>
+      <div class="zona">📍 ${a.Barrios_Afectados||a.Direccion||"-"}</div>
+      <div class="motivo">🕐 Inicio: ${inicio}<br>🕐 Fin: ${fin}<br>🔧 ${a.causante||"-"}</div>
+    `;
+    cont.appendChild(div);
   });
 }
 function filtrar(){
