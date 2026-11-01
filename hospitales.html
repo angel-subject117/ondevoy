@@ -17,27 +17,28 @@ body{background:#c5ddf6;min-height:100vh}
 .nav a.active{background:#8ec1e8;color:white;font-weight:700;padding:6px 16px}
 .nav .cr{background:#6faad8;color:white;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800}
 .main{max-width:1280px;margin:0 auto;padding:28px 24px 10px}
+.back-btn{display:inline-block;background:#8ec1e8;color:white;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none;margin-bottom:12px}
 .title-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
 .title h1{font-size:30px;font-weight:800;color:#102a5a}
 .title p{font-size:14px;color:#2a2a2a;margin-top:4px}
-.back-btn{display:inline-block;background:#8ec1e8;color:white;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none;margin-bottom:12px}
 .location-badge{border:1.5px solid #5a9bc8;color:#2a5a8a;background:rgba(255,255,255,0.4);padding:6px 14px;border-radius:20px;font-size:13px}
 .services-box{background:rgba(225,235,250,0.7);border-radius:20px;padding:18px;border:1px solid rgba(255,255,255,0.6)}
 .services-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}
-.services-header h2{font-size:26px;font-weight:800;color:#0a2a5c}
+.services-header h2{font-size:22px;font-weight:800;color:#0a2a5c}
 .services-header .meta{font-size:13px;color:#2a5a8a}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .card{background:white;border-radius:14px;padding:14px 12px;text-align:left;box-shadow:0 2px 6px rgba(0,0,0,0.06);border:1.5px solid #d6e6f5;transition:0.15s}
 .card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,0.12)}
 .card-icon{width:56px;height:56px;background:#d6e9f7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:28px}
-.card h3{font-size:16px;font-weight:800;color:#0a1f44;min-height:40px;text-align:center;line-height:1.2}
-.card .sub{font-size:11.5px;font-weight:600;margin-bottom:8px;color:#1a1a1a;text-align:center;min-height:32px}
-.badge{display:inline-flex;gap:5px;padding:4px 10px;border-radius:14px;font-size:11px;font-weight:700;color:white;margin:0 auto 8px;display:flex;width:fit-content;justify-content:center}
+.card h3{font-size:15px;font-weight:800;color:#0a1f44;min-height:38px;text-align:center;line-height:1.2}
+.card .sub{font-size:11px;font-weight:600;margin-bottom:8px;color:#1a1a1a;text-align:center;min-height:30px}
+.badge{display:flex;width:fit-content;margin:0 auto 8px;padding:4px 10px;border-radius:14px;font-size:11px;font-weight:700;color:white;justify-content:center}
 .badge-green{background:#6ab04c}.badge-blue{background:#2d7fc0}.badge-orange{background:#e5a02b}
-.card .info{font-size:11px;font-weight:500;line-height:1.4;color:#111}
-.card .info b{font-weight:700}
+.card .info{font-size:11px;font-weight:500;line-height:1.4;color:#111;margin-bottom:10px}
+.map-btn{display:block;text-align:center;background:#e1eefb;color:#0a2f5c;border:1.5px solid #8ec1e8;padding:6px 10px;border-radius:20px;font-size:11.5px;font-weight:700;text-decoration:none;transition:0.15s}
+.map-btn:hover{background:#8ec1e8;color:white}
 .footer{text-align:center;padding:18px 10px 12px;font-size:11.5px;color:#2a4a6a}
-@media(max-width:900px){.grid{grid-template-columns:1fr}.title-row{flex-direction:column;gap:10px}.header{flex-direction:column;gap:12px}}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -50,38 +51,39 @@ body{background:#c5ddf6;min-height:100vh}
 </header>
 <main class="main">
   <a href="./index.html" class="back-btn">← Volver a OnDeVoy</a>
-  <div class="title-row"><div class="title"><h1>Hospitales de Córdoba</h1><p>19 hospitales públicos - 12 provinciales y 7 municipales. Guardia, dirección y cómo sacar turno.</p></div><div class="location-badge">📍 Córdoba, Argentina</div></div>
+  <div class="title-row"><div class="title"><h1>Hospitales de Córdoba</h1><p>19 hospitales públicos con cómo llegar directo a Google Maps.</p></div><div class="location-badge">📍 Córdoba, Argentina</div></div>
+
   <div class="services-box">
-    <div class="services-header"><h2>PROVINCIALES - 12 hospitales</h2><div class="meta">Guardia 24hs • Turnos: 0800-555-4141 o CiDi</div></div>
+    <div class="services-header"><h2>PROVINCIALES - 12 hospitales</h2><div class="meta">0800-555-4141 o CiDi</div></div>
     <div class="grid">
-      <div class="card"><div class="card-icon">➕</div><h3>Hospital Córdoba</h3><div class="sub">Alta complejidad, quemados, neurocirugía, trasplantes, UTI</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info"><b>📍</b> Av. Patria 656, B° Gral. Pueyrredón<br><b>📞</b> 0800-555-4141 o CiDi</div></div>
-      <div class="card"><div class="card-icon">➕</div><h3>Hospital Misericordia</h3><div class="sub">Clínica médica, cirugía general, gineco</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info"><b>📍</b> Belgrano 1502, B° Güemes<br><b>📞</b> 0800-555-4141 o CiDi</div></div>
-      <div class="card"><div class="card-icon">➕</div><h3>Hospital Rawson</h3><div class="sub">Infectología referente provincial</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info"><b>📍</b> Bajada Pucará 2025, Polo Sanitario<br><b>📞</b> 0800-555-4141 o CiDi</div></div>
-      <div class="card"><div class="card-icon">➕</div><h3>Nuevo Hospital San Roque</h3><div class="sub">Adultos alta complejidad, UTI, clínica, cirugía</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info"><b>📍</b> Bajada Pucará 1900, Polo Sanitario<br><b>📞</b> 0800-555-4141 o CiDi</div></div>
-      <div class="card"><div class="card-icon">➕</div><h3>Hospital San Roque Viejo</h3><div class="sub">Baja y mediana complejidad</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info"><b>📍</b> Rosario de Santa Fe 374, Centro<br><b>📞</b> 0800-555-4141 o CiDi</div></div>
-      <div class="card"><div class="card-icon">👶</div><h3>Hospital Pediátrico del Niño Jesús</h3><div class="sub">Pediatría alta complejidad (ex Casa Cuna)</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info"><b>📍</b> Castro Barros 650, B° Gral. Paz<br><b>📞</b> 0800-555-4141 o CiDi</div></div>
-      <div class="card"><div class="card-icon">➕</div><h3>Hospital Tránsito Cáceres</h3><div class="sub">Clínica, cirugía, UTI - sureste capital</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info"><b>📍</b> Pringles y Balcarce, B° Gral. Paz<br><b>📞</b> 0800-555-4141 o CiDi</div></div>
-      <div class="card"><div class="card-icon">🤱</div><h3>Hospital Materno Neonatal</h3><div class="sub">Maternidad y neonatología alta complejidad</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info"><b>📍</b> Poeta Lugones esq. C. Sosa, Alto Verde<br><b>📞</b> 0800-555-4141 o CiDi</div></div>
-      <div class="card"><div class="card-icon">🧠</div><h3>Hospital Neuropsiquiátrico</h3><div class="sub">Salud mental adultos, psiquiatría</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info"><b>📍</b> León Morra 230, B° Juniors<br><b>📞</b> 0800-555-4141 o CiDi</div></div>
-      <div class="card"><div class="card-icon">➕</div><h3>Hospital Florencio Díaz</h3><div class="sub">Clínica general, cirugía, maternidad zonal</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info"><b>📍</b> 17 de Octubre esq. Los Tintines, Patricios<br><b>📞</b> 0800-555-4141 o CiDi</div></div>
-      <div class="card"><div class="card-icon">➕</div><h3>Hospital Eva Perón Suroeste</h3><div class="sub">Clínica, pediatría, maternidad suroeste</div><div class="badge badge-orange">Presencial - No usa 0800</div><div class="info"><b>📍</b> Santa Ana 4860, B° Matienzo<br><b>📞</b> Presencial en el hospital</div></div>
-      <div class="card"><div class="card-icon">🎗️</div><h3>Hospital Oncológico Urrutia</h3><div class="sub">Oncología adulto referente provincial</div><div class="badge badge-blue">Solo consultorios</div><div class="info"><b>📍</b> Bajada Pucará 1900, Polo Sanitario<br><b>📞</b> Derivación desde otro hospital</div></div>
+      <div class="card"><div class="card-icon">➕</div><h3>Hospital Córdoba</h3><div class="sub">Alta complejidad, quemados, neurocirugía, trasplantes</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info">📍 Av. Patria 656, Gral. Pueyrredón<br>📞 0800-555-4141 o CiDi</div><a class="map-btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Hospital+Cordoba+Av+Patria+656+Cordoba">📍 Cómo llegar</a></div>
+      <div class="card"><div class="card-icon">➕</div><h3>Hospital Misericordia</h3><div class="sub">Clínica médica, cirugía general, gineco</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info">📍 Belgrano 1502, Güemes<br>📞 0800-555-4141 o CiDi</div><a class="map-btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Hospital+Misericordia+Belgrano+1502+Cordoba">📍 Cómo llegar</a></div>
+      <div class="card"><div class="card-icon">➕</div><h3>Hospital Rawson</h3><div class="sub">Infectología referente provincial</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info">📍 Bajada Pucará 2025, Polo Sanitario<br>📞 0800-555-4141 o CiDi</div><a class="map-btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Hospital+Rawson+Bajada+Pucara+2025+Cordoba">📍 Cómo llegar</a></div>
+      <div class="card"><div class="card-icon">➕</div><h3>Nuevo Hospital San Roque</h3><div class="sub">Adultos alta complejidad, UTI, clínica</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info">📍 Bajada Pucará 1900, Polo Sanitario<br>📞 0800-555-4141 o CiDi</div><a class="map-btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Nuevo+Hospital+San+Roque+Bajada+Pucara+1900+Cordoba">📍 Cómo llegar</a></div>
+      <div class="card"><div class="card-icon">➕</div><h3>Hospital San Roque Viejo</h3><div class="sub">Baja y mediana complejidad</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info">📍 Rosario de Santa Fe 374, Centro<br>📞 0800-555-4141 o CiDi</div><a class="map-btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Hospital+San+Roque+Viejo+Rosario+Santa+Fe+374+Cordoba">📍 Cómo llegar</a></div>
+      <div class="card"><div class="card-icon">👶</div><h3>Hospital Pediátrico del Niño Jesús</h3><div class="sub">Pediatría alta complejidad</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info">📍 Castro Barros 650, Gral. Paz<br>📞 0800-555-4141 o CiDi</div><a class="map-btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Hospital+Pediatrico+Nino+Jesus+Castro+Barros+650+Cordoba">📍 Cómo llegar</a></div>
+      <div class="card"><div class="card-icon">➕</div><h3>Hospital Tránsito Cáceres</h3><div class="sub">Clínica, cirugía, UTI sureste</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info">📍 Pringles y Balcarce, Gral. Paz<br>📞 0800-555-4141 o CiDi</div><a class="map-btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Hospital+Transito+Caceres+Pringles+Balcarce+Cordoba">📍 Cómo llegar</a></div>
+      <div class="card"><div class="card-icon">🤱</div><h3>Hospital Materno Neonatal</h3><div class="sub">Maternidad y neonatología alta complejidad</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info">📍 Poeta Lugones esq. C. Sosa, Alto Verde<br>📞 0800-555-4141 o CiDi</div><a class="map-btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Hospital+Materno+Neonatal+Poeta+Lugones+Cordoba">📍 Cómo llegar</a></div>
+      <div class="card"><div class="card-icon">🧠</div><h3>Hospital Neuropsiquiátrico</h3><div class="sub">Salud mental adultos</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info">📍 León Morra 230, Juniors<br>📞 0800-555-4141 o CiDi</div><a class="map-btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Hospital+Neuropsiquiatrico+Leon+Morra+230+Cordoba">📍 Cómo llegar</a></div>
+      <div class="card"><div class="card-icon">➕</div><h3>Hospital Florencio Díaz</h3><div class="sub">Clínica general, cirugía, maternidad zonal</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info">📍 17 de Octubre esq. Los Tintines, Patricios<br>📞 0800-555-4141 o CiDi</div><a class="map-btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Hospital+Florencio+Diaz+Patricios+Cordoba">📍 Cómo llegar</a></div>
+      <div class="card"><div class="card-icon">➕</div><h3>Hospital Eva Perón Suroeste</h3><div class="sub">Clínica, pediatría, maternidad suroeste</div><div class="badge badge-orange">Presencial</div><div class="info">📍 Santa Ana 4860, Matienzo<br>📞 Presencial</div><a class="map-btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Hospital+Eva+Peron+Santa+Ana+4860+Cordoba">📍 Cómo llegar</a></div>
+      <div class="card"><div class="card-icon">🎗️</div><h3>Hospital Oncológico Urrutia</h3><div class="sub">Oncología adulto referente</div><div class="badge badge-blue">Solo consultorios</div><div class="info">📍 Bajada Pucará 1900, Polo Sanitario<br>📞 Derivación</div><a class="map-btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Hospital+Oncologico+Urrutia+Bajada+Pucara+Cordoba">📍 Cómo llegar</a></div>
     </div>
   </div>
 
   <div class="services-box" style="margin-top:18px">
-    <div class="services-header"><h2>MUNICIPALES - 7 hospitales</h2><div class="meta">Muni Córdoba • Turnos: 0800-888-0404</div></div>
+    <div class="services-header"><h2>MUNICIPALES - 7 hospitales</h2><div class="meta">0800-888-0404</div></div>
     <div class="grid">
-      <div class="card"><div class="card-icon">🚨</div><h3>Municipal de Urgencias</h3><div class="sub">Trauma, emergencias, shock room</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info"><b>📍</b> Catamarca 441, Centro<br><b>📞</b> Solo urgencia, no da turnos</div></div>
-      <div class="card"><div class="card-icon">👶</div><h3>Infantil Municipal</h3><div class="sub">Pediatría municipal, internación pediátrica</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info"><b>📍</b> Lavalleja 3050, Alta Córdoba<br><b>📞</b> 0800-888-0404 o presencial</div></div>
-      <div class="card"><div class="card-icon">➕</div><h3>Príncipe de Asturias</h3><div class="sub">Clínica general, pediatría, maternidad bajo riesgo</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info"><b>📍</b> Defensa 1200, Villa El Libertador<br><b>📞</b> 0800-888-0404 o presencial</div></div>
-      <div class="card"><div class="card-icon">⚡</div><h3>HPA Comipaz</h3><div class="sub">Clínica general, pediatría, atención rápida</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info"><b>📍</b> Onofrio Palamara 800, Talleres Oeste<br><b>📞</b> 0800-888-0404 - orden de llegada</div></div>
-      <div class="card"><div class="card-icon">⚡</div><h3>HPA Madre Teresa</h3><div class="sub">Clínica, pediatría, gineco rápida</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info"><b>📍</b> Cardeñosa esq. Quinquela Martín, Villa 9 de Julio<br><b>📞</b> 0800-888-0404 - orden de llegada</div></div>
-      <div class="card"><div class="card-icon">⚡</div><h3>HPA Cura Brochero</h3><div class="sub">Clínica, pediatría, atención rápida</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info"><b>📍</b> Molino de Torres y Don Bosco, Villa Rivera Indarte<br><b>📞</b> 0800-888-0404 - orden de llegada</div></div>
-      <div class="card"><div class="card-icon">⚡</div><h3>HPA San Jorge</h3><div class="sub">Clínica, pediatría, atención rápida</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info"><b>📍</b> Julio de Vedia y Baltasar de La Cueva, San Jorge<br><b>📞</b> 0800-888-0404 - orden de llegada</div></div>
+      <div class="card"><div class="card-icon">🚨</div><h3>Municipal de Urgencias</h3><div class="sub">Trauma, emergencias, shock room</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info">📍 Catamarca 441, Centro<br>📞 Solo urgencia</div><a class="map-btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Hospital+Municipal+Urgencias+Catamarca+441+Cordoba">📍 Cómo llegar</a></div>
+      <div class="card"><div class="card-icon">👶</div><h3>Infantil Municipal</h3><div class="sub">Pediatría municipal</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info">📍 Lavalleja 3050, Alta Córdoba<br>📞 0800-888-0404</div><a class="map-btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Hospital+Infantil+Municipal+Lavalleja+3050+Cordoba">📍 Cómo llegar</a></div>
+      <div class="card"><div class="card-icon">➕</div><h3>Príncipe de Asturias</h3><div class="sub">Clínica general, pediatría, maternidad bajo riesgo</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info">📍 Defensa 1200, Villa El Libertador<br>📞 0800-888-0404</div><a class="map-btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Hospital+Principe+Asturias+Defensa+1200+Cordoba">📍 Cómo llegar</a></div>
+      <div class="card"><div class="card-icon">⚡</div><h3>HPA Comipaz</h3><div class="sub">Atención rápida</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info">📍 Onofrio Palamara 800, Talleres Oeste<br>📞 0800-888-0404</div><a class="map-btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=HPA+Comipaz+Onofrio+Palamara+800+Cordoba">📍 Cómo llegar</a></div>
+      <div class="card"><div class="card-icon">⚡</div><h3>HPA Madre Teresa</h3><div class="sub">Clínica, pediatría, gineco rápida</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info">📍 Cardeñosa esq. Quinquela Martín, Villa 9 de Julio<br>📞 0800-888-0404</div><a class="map-btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=HPA+Madre+Teresa+Calcuta+Cordoba">📍 Cómo llegar</a></div>
+      <div class="card"><div class="card-icon">⚡</div><h3>HPA Cura Brochero</h3><div class="sub">Clínica, pediatría, atención rápida</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info">📍 Molino de Torres y Don Bosco, Rivera Indarte<br>📞 0800-888-0404</div><a class="map-btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=HPA+Cura+Brochero+Don+Bosco+Cordoba">📍 Cómo llegar</a></div>
+      <div class="card"><div class="card-icon">⚡</div><h3>HPA San Jorge</h3><div class="sub">Clínica, pediatría, atención rápida</div><div class="badge badge-green">Guardia 24hs Sí</div><div class="info">📍 Julio de Vedia y Baltasar de La Cueva, San Jorge<br>📞 0800-888-0404</div><a class="map-btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=HPA+San+Jorge+Julio+Vedia+Cordoba">📍 Cómo llegar</a></div>
     </div>
   </div>
 </main>
-<footer class="footer"><strong>OnDeVoy.com.ar</strong> • Datos oficiales Ministerio de Salud Córdoba y Municipalidad</footer>
+<footer class="footer"><strong>OnDeVoy.com.ar</strong> • Todo Córdoba en un solo lugar</footer>
 </body>
 </html>
