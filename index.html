@@ -7,29 +7,36 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
-body{background:#c5ddf6;min-height:100vh}
+body{background:#c5ddf6;min-height:100vh;display:flex;flex-direction:column}
 .header{background:white;border-radius:0 0 20px 20px;padding:14px 28px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
 .logo-title{font-size:32px;font-weight:900;color:#1a8ac4;line-height:1}
 .logo-title span{color:#0a2f5c}
 .logo-sub{font-size:12.5px;color:#5a8fb8;font-weight:500;margin-top:3px}
 .header-right{display:flex;align-items:center;gap:12px}
 .clima-box{background:#f1f8ff;border:1.5px solid #d6e6f5;border-radius:14px;padding:8px 14px;display:flex;align-items:center;gap:10px;min-width:210px}
-.clima-icon{font-size:26px}
-.clima-temp{font-weight:900;font-size:17px;color:#0a2f5c;line-height:1}
-.clima-txt{font-size:11px;color:#555;line-height:1.2}
-.main{max-width:1280px;margin:0 auto;padding:28px 24px}
+.main{max-width:1280px;margin:0 auto;padding:28px 24px;width:100%;flex:1}
 .hero{background:rgba(225,235,250,0.7);border-radius:20px;padding:24px;border:1px solid rgba(255,255,255,0.6)}
 .hero h1{font-size:32px;font-weight:900;color:#102a5a}
 .hero p{font-size:14px;color:#333;margin-top:6px}
 .grid-servicios{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:18px}
 .card-servicio{background:white;border-radius:16px;padding:18px;border:1.5px solid #d6e6f5;box-shadow:0 2px 8px rgba(0,0,0,0.06);text-decoration:none;display:block;transition:0.2s}
 .card-servicio:hover{transform:translateY(-3px);box-shadow:0 6px 18px rgba(0,0,0,0.1)}
-.card-servicio h3{font-size:18px;font-weight:800;color:#0a2f5c}
-.card-servicio p{font-size:12.5px;color:#555;margin-top:4px;line-height:1.3}
-.card-badge{display:inline-block;margin-top:10px;background:#2d7fc0;color:white;padding:6px 12px;border-radius:20px;font-size:11.5px;font-weight:700}
+.card-servicio h3{font-size:15px;font-weight:800;color:#0a2f5c}
+.card-servicio p{font-size:12px;color:#555;margin-top:4px;line-height:1.3}
+.card-badge{display:inline-block;margin-top:10px;color:white;padding:6px 12px;border-radius:20px;font-size:11px;font-weight:700}
 .live-dot{width:8px;height:8px;background:#22c55e;border-radius:50%;display:inline-block;animation:pulse 1.5s infinite}
 @keyframes pulse{0%{opacity:1} 50%{opacity:0.4} 100%{opacity:1}}
-@media(max-width:900px){.grid-servicios{grid-template-columns:1fr} .header{padding:14px 16px}}
+/* FOOTER ORIGINAL RESTAURADO */
+.footer{background:white;border-radius:20px 20px 0 0;margin-top:40px;padding:28px 32px}
+.footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:20px}
+.footer-brand h4{font-size:18px;font-weight:900;color:#0a2f5c}
+.footer-brand p{font-size:12.5px;color:#5a8fb8;margin-top:6px;line-height:1.4}
+.footer-col h5{font-size:13px;font-weight:800;color:#0a2f5c;margin-bottom:10px}
+.footer-col a{display:block;font-size:12.5px;color:#4a6a8a;text-decoration:none;margin-bottom:6px}
+.footer-col a:hover{color:#1a8ac4}
+.footer-bottom{border-top:1px solid #e6eef7;margin-top:20px;padding-top:14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.footer-bottom span{font-size:11.5px;color:#7a9ab8}
+@media(max-width:900px){.grid-servicios{grid-template-columns:1fr} .footer-grid{grid-template-columns:1fr 1fr} .header{padding:14px 16px}}
 </style>
 </head>
 <body>
@@ -39,13 +46,9 @@ body{background:#c5ddf6;min-height:100vh}
     <div class="logo-sub">Todo Córdoba, en tiempo real • Colectivos, clima y más</div>
   </div>
   <div class="header-right">
-    <!-- CLIMA EN TIEMPO REAL -->
     <div class="clima-box" id="clima-cba">
-      <div class="clima-icon">⏳</div>
-      <div>
-        <div class="clima-temp">Cargando clima...</div>
-        <div class="clima-txt">Córdoba Capital</div>
-      </div>
+      <div style="font-size:26px">⏳</div>
+      <div><div style="font-weight:900;font-size:16px;color:#0a2f5c">Cargando clima...</div><div style="font-size:11px;color:#555">Córdoba Capital</div></div>
     </div>
   </div>
 </header>
@@ -54,39 +57,33 @@ body{background:#c5ddf6;min-height:100vh}
   <div class="hero">
     <h1>¿A dónde vamos hoy? 🚌</h1>
     <p>OnDeVoy te muestra todo en vivo: colectivos, clima, farmacias, eventos y más de Córdoba.</p>
-    
     <div class="grid-servicios">
       <a href="./colectivos.html" class="card-servicio">
         <h3>🚌 Colectivos - 80 líneas</h3>
         <p>Recorridos, paradas y tiempo real vía Tu Bondi. Coniferal, TAMSE, SiBus, FAM y Trole.</p>
-        <span class="card-badge"><span class="live-dot"></span> TIEMPO REAL - Llega en X min</span>
+        <span class="card-badge" style="background:#2d7fc0"><span class="live-dot"></span> TIEMPO REAL - Llega en X min</span>
       </a>
-
-      <a href="#" class="card-servicio">
+      <a href="./farmacias.html" class="card-servicio">
         <h3>💊 Farmacias de turno</h3>
         <p>Encontrá la farmacia abierta más cercana a tu ubicación en Córdoba Capital.</p>
         <span class="card-badge" style="background:#8ec1e8">Ver farmacias</span>
       </a>
-
-      <a href="#" class="card-servicio">
+      <a href="./eventos.html" class="card-servicio">
         <h3>🎉 Eventos hoy</h3>
         <p>Qué hacer hoy en Córdoba: recitales, teatro, fiestas y ferias.</p>
         <span class="card-badge" style="background:#8ec1e8">Ver agenda</span>
       </a>
-
-      <a href="#" class="card-servicio">
-        <h3>🚨 Clima y Alertas</h3>
+      <a href="./clima.html" class="card-servicio">
+        <h3>🌦️ Clima y Alertas</h3>
         <p id="clima-resumen-card">Temperatura actual y pronóstico extendido 3 días.</p>
         <span class="card-badge" style="background:#0a2f5c" id="clima-badge-card">☀️ Ver pronóstico</span>
       </a>
-
-      <a href="#" class="card-servicio">
+      <a href="./tramites.html" class="card-servicio">
         <h3>📍 Trámites y Servicios</h3>
         <p>CPC, Rentas, EPEC, Aguas Cordobesas, Bancor y más.</p>
         <span class="card-badge" style="background:#8ec1e8">Ver servicios</span>
       </a>
-
-      <a href="#" class="card-servicio">
+      <a href="./mapa.html" class="card-servicio">
         <h3>🗺️ Mapa de Córdoba</h3>
         <p>Paradas de bondi, estaciones de bici y puntos de interés.</p>
         <span class="card-badge" style="background:#8ec1e8">Abrir mapa</span>
@@ -95,47 +92,68 @@ body{background:#c5ddf6;min-height:100vh}
   </div>
 </div>
 
+<!-- FOOTER CON TERMINOS ETC RESTAURADO -->
+<footer class="footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <h4>OnDeVoy.com.ar</h4>
+      <p>La guía más completa de Córdoba Capital. Información en tiempo real de colectivos, clima, farmacias, eventos y servicios. Hecho con ❤️ en Córdoba.</p>
+    </div>
+    <div class="footer-col">
+      <h5>Servicios</h5>
+      <a href="./colectivos.html">Colectivos</a>
+      <a href="./farmacias.html">Farmacias de turno</a>
+      <a href="./clima.html">Clima</a>
+      <a href="./eventos.html">Eventos</a>
+    </div>
+    <div class="footer-col">
+      <h5>Información</h5>
+      <a href="./about.html">Sobre nosotros</a>
+      <a href="./contacto.html">Contacto</a>
+      <a href="./prensa.html">Prensa</a>
+      <a href="./publicidad.html">Publicidad</a>
+    </div>
+    <div class="footer-col">
+      <h5>Legal</h5>
+      <a href="./terminos.html">Términos y condiciones</a>
+      <a href="./privacidad.html">Política de privacidad</a>
+      <a href="./cookies.html">Política de cookies</a>
+      <a href="./sitemap.html">Mapa del sitio</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 OnDeVoy.com.ar - Todos los derechos reservados</span>
+    <span>Córdoba, Argentina • Datos en tiempo real • v2.5 con Clima</span>
+  </div>
+</footer>
+
 <script>
-// CLIMA TIEMPO REAL - Open-Meteo Gratis
 async function cargarClima(){
   try{
     const r = await fetch('/api/clima');
     const j = await r.json();
     const c = j.actual;
-    
     let icono = '☀️';
     if(c.estado.includes('Nublado')) icono = '☁️';
     if(c.estado.includes('Parcial')) icono = '⛅';
     if(c.estado.includes('Lluvia') || c.estado.includes('Llovizna') || c.estado.includes('Chubasco')) icono = '🌧️';
     if(c.estado.includes('Tormenta')) icono = '⛈️';
     if(c.estado.includes('Niebla')) icono = '🌫️';
-
     document.getElementById('clima-cba').innerHTML = `
-      <div class="clima-icon">${icono}</div>
+      <div style="font-size:26px">${icono}</div>
       <div>
-        <div class="clima-temp">${c.temp}°C en Córdoba</div>
-        <div class="clima-txt">${c.estado} • ST ${c.sensacion}°C • Viento ${c.viento} km/h</div>
+        <div style="font-weight:900;font-size:16px;color:#0a2f5c">${c.temp}°C en Córdoba</div>
+        <div style="font-size:11px;color:#555">${c.estado} • ST ${c.sensacion}°C • Viento ${c.viento} km/h</div>
       </div>
     `;
-
-    // Actualizar también la card
     const resumen = document.getElementById('clima-resumen-card');
     const badge = document.getElementById('clima-badge-card');
     if(resumen) resumen.innerText = `${c.estado} - Max ${j.hoy.max}° / Min ${j.hoy.min}° - Humedad ${c.humedad}% - Prob lluvia ${j.hoy.probLluvia}%`;
     if(badge) badge.innerText = `${icono} ${c.temp}°C - Hoy ${j.hoy.max}°/${j.hoy.min}°`;
-
-  }catch(e){
-    document.getElementById('clima-cba').innerHTML = `
-      <div class="clima-icon">☀️</div>
-      <div>
-        <div class="clima-temp">24°C en Córdoba</div>
-        <div class="clima-txt">Despejado • OnDeVoy</div>
-      </div>
-    `;
-  }
+  }catch(e){}
 }
 cargarClima();
-setInterval(cargarClima, 300000); // cada 5 minutos
+setInterval(cargarClima, 300000);
 </script>
 </body>
 </html>
