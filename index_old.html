@@ -64,7 +64,10 @@ a.card-link{text-decoration:none;display:block;color:inherit}
       <a href="./cpcs.html" class="card-link"><div class="card"><div class="card-icon">🏛️</div><h3>CPCs</h3><div class="sub" style="font-size:12px">Centros de Participación Comunal</div><div class="badge badge-blue">📍 17 CPCs activos</div><div class="info">Horarios, direcciones y turnos MiDocta<br><small>Sin reportes hoy • Ver todos</small></div></div></a>
       <a href="./hospitales.html" class="card-link"><div class="card"><div class="card-icon">➕</div><h3>Hospitales</h3><div class="sub">Salud Pública</div><div class="badge badge-green">✚ Turnos hospitales</div><div class="info">Turnos disponibles • Hospital Córdoba<br><small>Guardia: Activa 24hs</small></div></div></a>
       <a href="./colectivos.html" class="card-link"><div class="card"><div class="card-icon">🚌</div><h3>Transporte</h3><div class="sub">Transporte Urbano</div><div class="badge badge-blue">🚌 Mi bondi</div><div class="info">Línea 25 • 8 min | Línea 600 • 12 min<br><small>Frecuencia actualizada</small></div></div></a>
-      <a href="./clima.html" class="card-link"><div class="card"><div class="card-icon">☁️</div><h3>Clima</h3><div class="sub">Clima Córdoba</div><div class="temp">18°C</div><div class="info">☁️ Parcialmente nublado<br>💨 Humedad 65% • Viento 12 km/h<br><small>Hoy Máx 22° • Mín 14°</small></div></div></a>
+
+      <!-- UNICO CAMBIO: CARD CLIMA EN TIEMPO REAL -->
+      <a href="./clima.html" class="card-link"><div class="card"><div class="card-icon" id="clima-icono">☁️</div><h3>Clima</h3><div class="sub">Clima Córdoba</div><div class="temp" id="clima-temp">18°C</div><div class="info" id="clima-info">☁️ Parcialmente nublado<br>💨 Humedad 65% • Viento 12 km/h<br><small id="clima-maxmin">Hoy Máx 22° • Mín 14°</small></div></div></a>
+
     </div>
   </div>
 </main>
@@ -77,6 +80,28 @@ a.card-link{text-decoration:none;display:block;color:inherit}
   var hoy = new Date();
   el.textContent = hoy.getDate() + ' ' + meses[hoy.getMonth()] + ' ' + hoy.getFullYear();
 })();
+
+// CLIMA EN TIEMPO REAL - solo esto se agrega
+async function cargarClimaIndex(){
+  try{
+    const r = await fetch('/api/clima');
+    const j = await r.json();
+    if(!j.ok) return;
+    const c = j.actual;
+    let icono = '☀️';
+    if(c.estado.includes('Nublado')) icono = '☁️';
+    if(c.estado.includes('Parcial')) icono = '⛅';
+    if(c.estado.includes('Lluvia') || c.estado.includes('Llovizna') || c.estado.includes('Chubasco')) icono = '🌧️';
+    if(c.estado.includes('Tormenta')) icono = '⛈️';
+    if(c.estado.includes('Niebla')) icono = '🌫️';
+
+    document.getElementById('clima-icono').textContent = icono;
+    document.getElementById('clima-temp').textContent = c.temp + '°C';
+    document.getElementById('clima-info').innerHTML = `☁️ ${c.estado}<br>💨 Humedad ${c.humedad}% • Viento ${c.viento} km/h<br><small id="clima-maxmin">Hoy Máx ${j.hoy.max}° • Mín ${j.hoy.min}° • ST ${c.sensacion}°</small>`;
+  }catch(e){ console.log('clima error', e); }
+}
+cargarClimaIndex();
+setInterval(cargarClimaIndex, 300000);
 </script>
 </body>
 </html>
