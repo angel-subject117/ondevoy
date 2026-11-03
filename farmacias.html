@@ -8,7 +8,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
 body{background:#c5ddf6;min-height:100vh}
-.header{background:white;border-radius:0 0 20px 20px;padding:14px 32px 14px 190px;display:flex;justify-content:space-between;align-items:center;position:relative}
+.header{background:white;border-radius:0 0 20px 20px;padding:14px 32px;display:flex;justify-content:space-between;align-items:center}
 .logo{display:flex;align-items:center;gap:10px}
 .logo-title{font-size:32px;font-weight:900;color:#1a8ac4}.logo-title span{color:#0a2f5c}
 .logo-sub{font-size:13px;color:#5a8fb8;font-weight:500;margin-top:2px}
@@ -16,7 +16,7 @@ body{background:#c5ddf6;min-height:100vh}
 .nav a{text-decoration:none;color:#4a4a4a;padding:6px 12px;border-radius:20px}
 .nav a.active{background:#8ec1e8;color:white;font-weight:700;padding:6px 16px}
 .nav .cr{background:#6faad8;color:white;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800}
-.main{max-width:1280px;margin:0 auto;padding:28px 24px 10px}
+.main{max-width:1280px;margin:0 auto;padding:20px 24px 10px}
 .title-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;flex-wrap:wrap;gap:10px}
 .title h1{font-size:30px;font-weight:800;color:#102a5a}
 .title p{font-size:14px;color:#2a2a2a;margin-top:4px}
@@ -43,23 +43,27 @@ body{background:#c5ddf6;min-height:100vh}
 .btn-wsp{background:#dcf8c6;color:#0a5a0a;border:1px solid #b6e7a0}
 .footer{text-align:center;padding:18px 10px 12px;font-size:11.5px;color:#2a4a6a}
 .footer a{color:#2a4a6a;text-decoration:none}
-/* BOTON CELESTE - IGUAL QUE LOS DEMAS */
-.btn-volver-ondevoy{position:absolute;left:14px;top:50%;transform:translateY(-50%);z-index:10;background:#8ec1e8;color:white;padding:10px 18px;border-radius:22px;font-size:13px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(142,193,232,0.4);transition:0.2s}
-.btn-volver-ondevoy:hover{background:#6faad8;transform:translateY(-50%) translateY(-2px)}
-@media(max-width:900px){.header{padding-left:32px;padding-top:56px}.btn-volver-ondevoy{top:12px;transform:none}.btn-volver-ondevoy:hover{transform:translateY(-2px)}.grid-farmas{grid-template-columns:1fr}.title-row{flex-direction:column}}
+/* BOTON IDENTICO A EPEC - ARRIBA DEL TITULO */
+.btn-volver-ondevoy{background:#8ec1e8;color:white;padding:8px 18px;border-radius:20px;font-size:14px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:6px;margin-bottom:14px;transition:0.2s}
+.btn-volver-ondevoy:hover{background:#6faad8;transform:translateY(-1px)}
+@media(max-width:900px){.grid-farmas{grid-template-columns:1fr}.header{flex-direction:column;gap:12px}.title-row{flex-direction:column}}
 </style>
 </head>
 <body>
 <header class="header">
-  <a href="./index.html" class="btn-volver-ondevoy">⬅️ Volver a OnDeVoy</a>
   <div class="logo">
     <svg viewBox="0 0 48 60" width="52" height="52"><path d="M24 0 C10 0 0 10 0 22 C0 38 24 60 24 60 C24 60 48 38 48 22 C48 10 38 0 24 0 Z" fill="#d6ecff" stroke="#3a8ac0" stroke-width="2.5"/><circle cx="24" cy="20" r="11" fill="white" stroke="#3a8ac0" stroke-width="2.2"/></svg>
     <div><div class="logo-title">OnDeVoy<span>.com.ar</span></div><div class="logo-sub">Todo Córdoba en un solo lugar</div></div>
   </div>
   <nav class="nav"><a href="./index.html">Inicio</a><a href="#" class="active">Farmacias</a><a href="#">🔔 Alertas</a><a href="#">Ayuda</a><div class="cr">CR</div></nav>
 </header>
+
 <main class="main">
+  <!-- BOTON IGUAL QUE EPEC - ARRIBA DE TODO -->
+  <a href="./index.html" class="btn-volver-ondevoy">← Volver a OnDeVoy</a>
+
   <div class="title-row"><div class="title"><h1>💊 Farmacias de Turno Hoy</h1><p>85 farmacias de turno hoy en Córdoba • Fuente: Colegio Farmacéutico • <span id="fecha-dinamica">cargando...</span></p></div><div class="location-badge">📍 Córdoba, Argentina</div></div>
+
   <div class="services-box">
     <div class="services-header"><h2 id="titulo-listado">Listado de Farmacias</h2><div class="meta" id="meta-info">Cargando 85 farmacias...</div></div>
     <div class="controls">
@@ -72,7 +76,9 @@ body{background:#c5ddf6;min-height:100vh}
     </div>
   </div>
 </main>
+
 <footer class="footer"><strong>OnDeVoy.com.ar</strong> • Datos: Colegio Farmacéutico de Córdoba • Soporte: <a href="mailto:ayuda@ondevoy.com.ar" style="color:#0a2a5c;text-decoration:underline;font-weight:700;">ayuda@ondevoy.com.ar</a></footer>
+
 <script>
 (function(){ var el=document.getElementById('fecha-dinamica'); if(!el) return; var meses=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic']; var hoy=new Date(); el.textContent= hoy.getDate()+' '+meses[hoy.getMonth()]+' '+hoy.getFullYear(); })();
 let TODAS = [];
