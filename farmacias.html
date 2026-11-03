@@ -1,1 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Farmacias de Turno Hoy - Córdoba - OnDeVoy</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
+body{background:#c5ddf6;min-height:100vh}
+.header{background:white;border-radius:0 0 20px 20px;padding:14px 32px;display:flex;justify-content:space-between;align-items:center}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-title{font-size:32px;font-weight:900;color:#1a8ac4}.logo-title span{color:#0a2f5c}
+.logo-sub{font-size:13px;color:#5a8fb8;font-weight:500;margin-top:2px}
+.nav{display:flex;align-items:center;gap:22px;font-size:14px}
+.nav a{text-decoration:none;color:#4a4a4a;padding:6px 12px;border-radius:20px}
+.nav a.active{background:#8ec1e8;color:white;font-weight:700;padding:6px 16px}
+.nav .cr{background:#6faad8;color:white;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800}
+.main{max-width:1280px;margin:0 auto;padding:28px 24px 10px}
+.title-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+.title h1{font-size:30px;font-weight:800;color:#102a5a}
+.title p{font-size:14px;color:#2a2a2a;margin-top:4px}
+.location-badge{border:1.5px solid #5a9bc8;color:#2a5a8a;background:rgba(255,255,255,0.4);padding:6px 14px;border-radius:20px;font-size:13px}
+.services-box{background:rgba(225,235,250,0.7);border-radius:20px;padding:18px;border:1px solid rgba(255,255,255,0.6)}
+.services-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.services-header h2{font-size:22px;font-weight:800;color:#0a2a5c}
+.services-header .meta{font-size:13px;color:#2a5a8a}
+.controls{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.controls input, .controls select{padding:10px 14px;border-radius:12px;border:1.5px solid #d6e6f5;font-size:14px;outline:none;background:white}
+.controls input{flex:1;min-width:220px}
+.grid-farmas{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.card-farma{background:white;border-radius:14px;padding:14px 14px;text-align:left;box-shadow:0 2px 6px rgba(0,0,0,0.06);border:1.5px solid #d6e6f5;transition:0.15s}
+.card-farma:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,0.12)}
+.card-farma h3{font-size:16px;font-weight:800;color:#0a1f44;margin-bottom:2px}
+.card-farma .zona{font-size:12px;color:#1a8ac4;font-weight:600;margin-bottom:6px}
+.badge{display:inline-flex;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:700;color:white;margin-bottom:6px}
+.badge-green{background:#6ab04c}.badge-blue{background:#2d7fc0}.badge-orange{background:#e5a02b}
+.card-farma .dir{font-size:12px;color:#333;line-height:1.3;margin-bottom:4px}
+.card-farma .tel{font-size:12px;color:#111;font-weight:600}
+.card-farma .acciones{margin-top:8px;display:flex;gap:8px}
+.card-farma .acciones a{font-size:11px;padding:6px 10px;border-radius:10px;text-decoration:none;font-weight:700}
+.btn-mapa{background:#e6f2ff;color:#0a2a5c;border:1px solid #c5ddf6}
+.btn-wsp{background:#dcf8c6;color:#0a5a0a;border:1px solid #b6e7a0}
+.footer{text-align:center;padding:18px 10px 12px;font-size:11.5px;color:#2a4a6a}
+.footer a{color:#2a4a6a;text-decoration:none}
+.btn-volver-ondevoy{position:fixed;top:14px;left:14px;z-index:9999;background:#0a1f44;color:white;padding:10px 18px;border-radius:22px;font-size:13px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(0,0,0,0.15);transition:0.2s}
+.btn-volver-ondevoy:hover{transform:translateY(-2px);background:#102a5a}
+@media(max-width:900px){.grid-farmas{grid-template-columns:1fr}.header{flex-direction:column;gap:12px}.title-row{flex-direction:column}}
+</style>
+</head>
+<body>
+<a href="./index.html" class="btn-volver-ondevoy">⬅️ Volver a OnDeVoy</a>
 
+<header class="header">
+  <div class="logo">
+    <svg viewBox="0 0 48 60" width="52" height="52"><path d="M24 0 C10 0 0 10 0 22 C0 38 24 60 24 60 C24 60 48 38 48 22 C48 10 38 0 24 0 Z" fill="#d6ecff" stroke="#3a8ac0" stroke-width="2.5"/><circle cx="24" cy="20" r="11" fill="white" stroke="#3a8ac0" stroke-width="2.2"/></svg>
+    <div><div class="logo-title">OnDeVoy<span>.com.ar</span></div><div class="logo-sub">Todo Córdoba en un solo lugar</div></div>
+  </div>
+  <nav class="nav"><a href="./index.html">Inicio</a><a href="#" class="active">Farmacias</a><a href="#">🔔 Alertas</a><a href="#">Ayuda</a><div class="cr">CR</div></nav>
+</header>
+
+<main class="main">
+  <div class="title-row"><div class="title"><h1>💊 Farmacias de Turno Hoy</h1><p>85 farmacias de turno hoy en Córdoba • Fuente: Colegio Farmacéutico • <span id="fecha-dinamica">cargando...</span></p></div><div class="location-badge">📍 Córdoba, Argentina</div></div>
+
+  <div class="services-box">
+    <div class="services-header"><h2 id="titulo-listado">Listado de Farmacias</h2><div class="meta" id="meta-info">Cargando 85 farmacias...</div></div>
+
+    <div class="controls">
+      <input id="buscador" type="text" placeholder="🔍 Buscar por barrio, calle o nombre... Ej: Nueva Córdoba, Gral Paz">
+      <select id="filtro-zona"><option value="">Todas las zonas</option><option>Centro</option><option>Nueva Córdoba</option><option>Alberdi</option><option>General Paz</option><option>Alta Córdoba</option><option>Argüello</option><option>Cerro</option></select>
+      <select id="filtro-horario"><option value="">Todas</option><option value="24">Solo 24HS</option></select>
+    </div>
+
+    <div class="grid-farmas" id="grid-farmas">
+      <div class="card-farma" style="text-align:center;grid-column:1/-1;padding:30px">⏳ Cargando farmacias de turno de hoy...<br><small style="color:#666">Conectando con Colegio Farmacéutico</small></div>
+    </div>
+  </div>
+</main>
+
+<footer class="footer"><strong>OnDeVoy.com.ar</strong> • Datos: Colegio Farmacéutico de Córdoba • Soporte: <a href="mailto:ayuda@ondevoy.com.ar" style="color:#0a2a5c;text-decoration:underline;font-weight:700;">ayuda@ondevoy.com.ar</a></footer>
+
+<script>
+// Fecha dinámica
+(function(){ var el=document.getElementById('fecha-dinamica'); if(!el) return; var meses=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic']; var hoy=new Date(); el.textContent= hoy.getDate()+' '+meses[hoy.getMonth()]+' '+hoy.getFullYear(); })();
+
+// Carga farmacias desde /api/farmacias
+let TODAS = [];
+async function cargarFarmacias(){
+  try{
+    const r = await fetch('/api/farmacias');
+    const j = await r.json();
+    if(!j.ok) throw new Error('api no ok');
+    TODAS = j.farmacias || [];
+    document.getElementById('meta-info').textContent = `${TODAS.length} farmacias • Actualizado: ${j.actualizado || 'hoy'} • Ver mapa y contacto`;
+    render(TODAS);
+    // actualizar badge de index si viene de index
+    try{
+      const info = document.getElementById('farmacias-info');
+      if(window.opener && info){} // placeholder
+    }catch(e){}
+  }catch(e){
+    document.getElementById('grid-farmas').innerHTML = `<div class="card-farma" style="grid-column:1/-1;text-align:center;color:#a00">❌ No se pudo cargar. Verificá que exista <b>api/farmacias.js</b><br><small>${e.message}</small></div>`;
+  }
+}
+
+function render(lista){
+  const grid = document.getElementById('grid-farmas');
+  if(lista.length===0){ grid.innerHTML = `<div class="card-farma" style="grid-column:1/-1;text-align:center">No hay resultados para tu búsqueda</div>`; return; }
+  grid.innerHTML = lista.map(f => `
+    <div class="card-farma">
+      <h3>${f.nombre}</h3>
+      <div class="zona">📍 ${f.zona || f.barrio || ''} ${f.direccion ? '• '+f.direccion : ''}</div>
+      <div class="badge ${f.horario && f.horario.includes('24') ? 'badge-green' : 'badge-blue'}">${f.horario || 'Turno Hoy'}</div>
+      <div class="dir">${f.direccion || ''}${f.barrio ? ' - '+f.barrio : ''}</div>
+      <div class="tel">${f.telefono ? '📞 '+f.telefono : ''}</div>
+      <div class="acciones">
+        <a class="btn-mapa" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((f.nombre+' '+(f.direccion||'')+' Córdoba'))}" target="_blank">🗺️ Mapa</a>
+        ${f.telefono ? `<a class="btn-wsp" href="tel:${f.telefono.replace(/[^0-9+]/g,'')}">📞 Llamar</a>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+document.getElementById('buscador').addEventListener('input', e=>{
+  const q = e.target.value.toLowerCase();
+  const zona = document.getElementById('filtro-zona').value.toLowerCase();
+  const h24 = document.getElementById('filtro-horario').value;
+  let filtradas = TODAS.filter(f=> (f.nombre+f.direccion+f.barrio+f.zona).toLowerCase().includes(q));
+  if(zona) filtradas = filtradas.filter(f=> (f.zona+f.barrio+f.direccion).toLowerCase().includes(zona));
+  if(h24==="24") filtradas = filtradas.filter(f=> (f.horario||'').toLowerCase().includes('24'));
+  render(filtradas);
+  document.getElementById('titulo-listado').textContent = `Listado (${filtradas.length})`;
+});
+document.getElementById('filtro-zona').addEventListener('change', ()=> document.getElementById('buscador').dispatchEvent(new Event('input')));
+document.getElementById('filtro-horario').addEventListener('change', ()=> document.getElementById('buscador').dispatchEvent(new Event('input')));
+
+cargarFarmacias();
+</script>
+</body>
+</html>
