@@ -43,7 +43,6 @@ body{background:#c5ddf6;min-height:100vh}
 .btn-wsp{background:#dcf8c6;color:#0a5a0a;border:1px solid #b6e7a0}
 .footer{text-align:center;padding:18px 10px 12px;font-size:11.5px;color:#2a4a6a}
 .footer a{color:#2a4a6a;text-decoration:none}
-/* BOTON IDENTICO A EPEC - ARRIBA DEL TITULO */
 .btn-volver-ondevoy{background:#8ec1e8;color:white;padding:8px 18px;border-radius:20px;font-size:14px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:6px;margin-bottom:14px;transition:0.2s}
 .btn-volver-ondevoy:hover{background:#6faad8;transform:translateY(-1px)}
 @media(max-width:900px){.grid-farmas{grid-template-columns:1fr}.header{flex-direction:column;gap:12px}.title-row{flex-direction:column}}
@@ -59,16 +58,15 @@ body{background:#c5ddf6;min-height:100vh}
 </header>
 
 <main class="main">
-  <!-- BOTON IGUAL QUE EPEC - ARRIBA DE TODO -->
   <a href="./index.html" class="btn-volver-ondevoy">← Volver a OnDeVoy</a>
 
-  <div class="title-row"><div class="title"><h1>💊 Farmacias de Turno Hoy</h1><p>85 farmacias de turno hoy en Córdoba • Fuente: Colegio Farmacéutico • <span id="fecha-dinamica">cargando...</span></p></div><div class="location-badge">📍 Córdoba, Argentina</div></div>
+  <div class="title-row"><div class="title"><h1>💊 Farmacias de Turno Hoy</h1><p><span id="contador-arriba">...</span> farmacias de turno hoy en Córdoba • Fuente: Colegio Farmacéutico • <span id="fecha-dinamica">cargando...</span></p></div><div class="location-badge">📍 Córdoba, Argentina</div></div>
 
   <div class="services-box">
-    <div class="services-header"><h2 id="titulo-listado">Listado de Farmacias</h2><div class="meta" id="meta-info">Cargando 85 farmacias...</div></div>
+    <div class="services-header"><h2 id="titulo-listado">Listado</h2><div class="meta" id="meta-info">Cargando farmacias...</div></div>
     <div class="controls">
       <input id="buscador" type="text" placeholder="🔍 Buscar por barrio, calle o nombre... Ej: Nueva Córdoba, Gral Paz">
-      <select id="filtro-zona"><option value="">Todas las zonas</option><option>Centro</option><option>Nueva Córdoba</option><option>Alberdi</option><option>General Paz</option><option>Alta Córdoba</option><option>Argüello</option><option>Cerro</option></select>
+      <select id="filtro-zona"><option value="">Todas las zonas</option><option>Centro</option><option>Nueva Córdoba</option><option>General Paz</option><option>Alberdi</option><option>Alta Córdoba</option><option>Argüello</option><option>Cerro</option></select>
       <select id="filtro-horario"><option value="">Todas</option><option value="24">Solo 24HS</option></select>
     </div>
     <div class="grid-farmas" id="grid-farmas">
@@ -89,6 +87,8 @@ async function cargarFarmacias(){
     if(!j.ok) throw new Error('api no ok');
     TODAS = j.farmacias || [];
     document.getElementById('meta-info').textContent = `${TODAS.length} farmacias • Actualizado: ${j.actualizado || 'hoy'} • Ver mapa y contacto`;
+    document.getElementById('contador-arriba').textContent = `${TODAS.length}`;
+    document.getElementById('titulo-listado').textContent = `Listado (${TODAS.length})`;
     render(TODAS);
   }catch(e){
     document.getElementById('grid-farmas').innerHTML = `<div class="card-farma" style="grid-column:1/-1;text-align:center;color:#a00">❌ No se pudo cargar. Verificá que exista <b>api/farmacias.js</b><br><small>${e.message}</small></div>`;
